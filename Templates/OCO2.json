@@ -1,0 +1,22 @@
+{
+  "timeout": 8000,
+  "interval": 1,
+  "order": {
+    "type": "OneCancelsTheOther",
+    "pair": "FOOUSD",
+    "startPrice": 15,
+    "stoploss": {
+      "id": "XXXXXX-XXXXX-123456",
+      "volume": 1,
+      "edit": {
+        "triggerPrice": 15.5,
+        "newPrice": 15
+      }
+    },
+    "takeprofit": {
+      "price": 16,
+      "volume": 1,
+      "greedy": true
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "timeout": 6000,
+  "interval": 1,
+  "order": {
+    "type": "TrailingStopLoss",
+    "pair": "FOOUSD",
+    "stoploss": {
+      "id": "XXXXXX-XXXXX-123456",
+      "volume": 1,
+      "trailing": [ 15, 16, 17 ]
+    }
+  }
+}

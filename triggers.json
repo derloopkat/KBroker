@@ -1,0 +1,21 @@
+{
+  "triggers": [
+    {
+      "pair": "LUNAUSD",
+      "event": {
+        "above": "81"
+      },
+      "actions": [
+        {
+          "close": "OXFWE434"
+        },
+        {
+          "sell": "market",
+          "volume": "999.98508"
+        }
+      ]
+    }
+  ]
+}
+
+

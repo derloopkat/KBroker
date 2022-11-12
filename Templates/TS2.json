@@ -1,0 +1,14 @@
+{
+  "timeout": 6000,
+  "interval": 16,
+  "order": {
+    "type": "TrailingStopLoss",
+    "pair": "FOOUSD",
+	"startPrice": 14,
+    "stoploss": {
+      "price": 13.932,
+      "volume": 145.558235,
+      "trailing": [ 14, 14.110, 14.297, 14.397, 14.847 ]
+    }
+  }
+}
