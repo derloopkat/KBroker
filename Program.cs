@@ -19,8 +19,8 @@ namespace KBroker
             /* This line is for running simulation with fake broker */
             var broker = new Simulator
             (
-                currentPrice: 14.12m,
-                priceTrend: SimulatedPriceTrend.MockedDescending,
+                currentPrice: 15.9m,
+                priceTrend: SimulatedPriceTrend.MockedAscending,
                 stopLossPrice: 13.727m
             );
 
@@ -40,16 +40,16 @@ namespace KBroker
 
             if (!stopLossWasAddedByUser) Display.AddOrderResponse(trigger.StopLoss, response);
 
-            if (!(broker is Simulator) && broker.GetSystemStatus() != Broker.SystemStatus.Online)
+            if (broker is not Simulator && broker.GetSystemStatus() != Broker.SystemStatus.Online)
             {
-                throw new Exception("Exchange unavailable or under maintenance.", new Exception("SystemStatus"));
+                throw new SystemStatusException("Exchange unavailable or under maintenance.");
             }
 
             while (!trigger.TasksCompleted)
             {
                 var done = broker.PercentageDone;
                 var wait = done >= 93 && done <= 95 ? Math.Min(seconds(8), broker.IntervalMiliseconds)
-                        : done >= 96 && done <= 104 ? Math.Min(seconds(2), broker.IntervalMiliseconds)
+                        : done >= 96 && done <= 104 ? Math.Min(seconds(trigger.TakeProfit.PlainGreed ? 6 : 3), broker.IntervalMiliseconds)
                         : done >= 105 && done <= 110 ? Math.Min(seconds(8), broker.IntervalMiliseconds)
                         : done >= 111 && done <= 120 ? Math.Min(seconds(16), broker.IntervalMiliseconds)
                         : broker.IntervalMiliseconds;

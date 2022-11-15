@@ -18,6 +18,7 @@ namespace KBroker
         public bool IsOkay { get; set; }
         public bool IsOpen { get; set; }
         public bool BeGreedy { get; set; }
+        public bool PlainGreed { get; set; }
         public bool Error { get; set; }
         public bool Validate { get; set; }
         public decimal? Price { get; set; }

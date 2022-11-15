@@ -39,10 +39,10 @@ namespace KBroker
             if (Prices != null)
             {
                 var step = Math.Round(CurrentPrice * 0.005M, 4, MidpointRounding.AwayFromZero);
-                if (RandomValue.Next(1, 4) == 2)
-                {
-                    step = -step / 2;
-                }
+                var choice = RandomValue.Next(1, 4);
+                step = choice == 2 ? step = -step / 2
+                       : choice == 1 ? 0
+                       : step;
 
                 if (PriceTrend == SimulatedPriceTrend.MockedAscending)
                     CurrentPrice += step;

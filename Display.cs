@@ -116,7 +116,9 @@ namespace KBroker
                 : ConsoleColor.Yellow;
             Print($"{timeStamp} ", ConsoleColor.White, true);
             Print($"{pair} ", ConsoleColor.Gray, true);
-            Print($"Start: {symbol}{startPrice} Current: ", ConsoleColor.White, true);
+            Print($"Start: ", ConsoleColor.White, true);
+            Print($"{symbol}{startPrice} ", ConsoleColor.Cyan, true);
+            Print($"Current: ", ConsoleColor.White, true);
             Print($"{symbol}{currentPrice}    ", priceColor, true);
             for(int i=0; i < frames.Count; i++)
             {

@@ -127,6 +127,11 @@ namespace KBroker
             return currentPrice;
         }
 
+        public Price GetLastPrice()
+        {
+            return LastPriceId == 0 ? null : Prices[LastPriceId];
+        }
+
         public void WaitForStartPrice(string pair, decimal startPrice)
         {
             decimal price = 0;
@@ -137,7 +142,7 @@ namespace KBroker
                 {
                     price = GetCurrentPrice().Close;
                     Display.PrintWaitingForStartPrice(Pair, price, InitialPrice.Value, startPrice);
-                    Console.Title = $"KBorker awaiting...";
+                    Console.Title = $"Awaiting {Pair}...";
                 }
                 catch (Exception ex)
                 {
@@ -246,10 +251,10 @@ namespace KBroker
         public bool PriceLostTooMuchGains(decimal currentPrice, decimal takeProfitPrice)
         {
             TimeSpan timeSinceMaxWasSet = MaxPrice.Created.HasValue ? MaxPrice.Created.Value - DateTime.Now : TimeSpan.MaxValue;
-            decimal seekToKeepAtLeastThisPercentageFromGains = timeSinceMaxWasSet.TotalMinutes < 5 ? 30
-                : timeSinceMaxWasSet.TotalMinutes < 8 ? 40
-                : timeSinceMaxWasSet.TotalMinutes < 15 ? 60
-                : timeSinceMaxWasSet.TotalMinutes < 20 ? 75
+            decimal seekToKeepAtLeastThisPercentageFromGains = timeSinceMaxWasSet.TotalMinutes < 3 ? 30
+                : timeSinceMaxWasSet.TotalMinutes < 5 ? 40
+                : timeSinceMaxWasSet.TotalMinutes < 8 ? 60
+                : timeSinceMaxWasSet.TotalMinutes < 10 ? 75
                 : 80;
             var minimumAcceptableGains = (MaxPrice.Close - takeProfitPrice) * seekToKeepAtLeastThisPercentageFromGains / 100;
             var minimumAcceptablePrice = takeProfitPrice + minimumAcceptableGains;

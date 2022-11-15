@@ -5,15 +5,22 @@ namespace KBroker
 {
     public class OneCancelsTheOther : Trigger
     {
+        private int RepeatedLastPrice = 0;
         public OneCancelsTheOther()
         {
             TakeProfit = new Order();
             StopLoss = new Order();
         }
 
-        private bool WaitForBetterPrice(Broker broker, decimal currentPrice)
+        private bool WaitForBetterPrice(Broker broker, decimal currentPrice, decimal? lastPrice)
         {
-            return TakeProfit.BeGreedy && !broker.PriceLostTooMuchGains(currentPrice, TakeProfit.Price.Value);
+            RepeatedLastPrice += lastPrice == currentPrice ? 1 : - RepeatedLastPrice;
+            if (TakeProfit.PlainGreed)
+                return lastPrice.HasValue && currentPrice >= lastPrice && RepeatedLastPrice <= 3 ;
+            else if (TakeProfit.BeGreedy)
+                return !broker.PriceLostTooMuchGains(currentPrice, TakeProfit.Price.Value);
+            else
+                return false;
         }
 
         public override void Execute(Broker broker)
@@ -21,8 +28,8 @@ namespace KBroker
             try
             {
                 dynamic response = null;
-                var lastPrice = broker.LastPriceId == 0 ? null : broker.Prices[broker.LastPriceId];
-                var price = broker.GetCurrentPrice();
+                Price lastPrice = broker.LastPriceId == 0 ? null : broker.Prices[broker.LastPriceId]; ;
+                Price price = broker.GetCurrentPrice();
                 broker.PercentageDone = Display.PrintProgress(
                     StopLoss.Pair, 
                     TakeProfit.Price.Value,
@@ -30,7 +37,7 @@ namespace KBroker
                     price.Close, 
                     lastPrice?.Close ?? price.Close);
 
-                if (price.Close >= TakeProfit.Price && !WaitForBetterPrice(broker, price.Close))
+                if (price.Close >= TakeProfit.Price && !WaitForBetterPrice(broker, price.Close, lastPrice?.Close))
                 {
                     if(broker.GetSystemStatus() != Broker.SystemStatus.Online)
                     {

@@ -65,12 +65,14 @@ namespace KBroker
             }
             else
             {
-                var greedy = section.GetSection("greedy")?.Value ?? "false";
                 var volume = section.GetSection("volume");
+                var greedy = section.GetSection("greedy")?.Value ?? "false";
+                var plainGreed = section.GetSection("plainGreed")?.Value ?? "false";
                 trigger.TakeProfit.OrderType = OrderType.Market;
                 trigger.TakeProfit.SideType = OrderSide.Sell;
                 trigger.TakeProfit.Price = decimal.Parse(section.GetSection("price").Value);
                 trigger.TakeProfit.BeGreedy = bool.Parse(greedy);
+                trigger.TakeProfit.PlainGreed = bool.Parse(plainGreed);
                 trigger.TakeProfit.Pair = section.GetSection("pair").Exists() ? section.GetSection("pair").Value : Pair;
 
                 if (volume.Exists())
