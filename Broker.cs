@@ -50,6 +50,23 @@ namespace KBroker
             }
         }
 
+        public void Trade(Trigger trigger)
+        {
+            int seconds(double value) => (int)(value * 1000);
+            while (!trigger.TasksCompleted)
+            {
+                var done = this.PercentageDone;
+                var wait = done >= 93 && done <= 95 ? Math.Min(seconds(8), IntervalMiliseconds)
+                        : done >= 96 && done <= 104 ? Math.Min(seconds(trigger.TakeProfit.PlainGreed ? 6 : 3), IntervalMiliseconds)
+                        : done >= 105 && done <= 110 ? Math.Min(seconds(8), IntervalMiliseconds)
+                        : done >= 111 && done <= 120 ? Math.Min(seconds(16), IntervalMiliseconds)
+                        : IntervalMiliseconds;
+                //System.Diagnostics.Debug.Print(wait.ToString());
+                trigger.Execute(this);
+                Thread.Sleep(wait);
+            }
+        }
+
         public SystemStatus GetSystemStatus()
         {
             string json = KrakenApi.QueryPublicEndpoint("SystemStatus").Result;

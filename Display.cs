@@ -84,7 +84,7 @@ namespace KBroker
         public static void PrintError(string errorCode, bool bell = true)
         {
             var message = ErrorDetails.ContainsKey(errorCode) ? $"{errorCode}. Details: {ErrorDetails[errorCode]}" : $"{errorCode}";
-            var clearCharactersToTheRight = new string(' ', Console.WindowWidth - message.Length);
+            var clearCharactersToTheRight = new string(' ', Console.WindowWidth - Math.Min(Console.WindowWidth, message.Length));
             Print(message + clearCharactersToTheRight, ConsoleColor.Red);
             if (bell) Console.WriteLine("\a");
         }

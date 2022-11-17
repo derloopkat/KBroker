@@ -27,7 +27,6 @@ namespace KBroker
             ///* Above line is running the application for real  */
             //var broker = new Broker();
 
-            int seconds(double value) => (int)(value * 1000);
             broker.WaitForStartPrice(broker.Pair, trigger.StartPrice ?? 0);
 
             var response = trigger.SetupOrders(broker);
@@ -45,18 +44,7 @@ namespace KBroker
                 throw new SystemStatusException("Exchange unavailable or under maintenance.");
             }
 
-            while (!trigger.TasksCompleted)
-            {
-                var done = broker.PercentageDone;
-                var wait = done >= 93 && done <= 95 ? Math.Min(seconds(8), broker.IntervalMiliseconds)
-                        : done >= 96 && done <= 104 ? Math.Min(seconds(trigger.TakeProfit.PlainGreed ? 6 : 3), broker.IntervalMiliseconds)
-                        : done >= 105 && done <= 110 ? Math.Min(seconds(8), broker.IntervalMiliseconds)
-                        : done >= 111 && done <= 120 ? Math.Min(seconds(16), broker.IntervalMiliseconds)
-                        : broker.IntervalMiliseconds;
-                //System.Diagnostics.Debug.Print(wait.ToString());
-                trigger.Execute(broker);
-                Thread.Sleep(wait);
-            }
+            broker.Trade(trigger);
 
             Console.ReadLine();
 
