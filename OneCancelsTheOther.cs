@@ -5,7 +5,7 @@ namespace KBroker
 {
     public class OneCancelsTheOther : Trigger
     {
-        private int RepeatedLastPrice = 0;
+        private bool FailedToSellGreedyTakeprofit = false;
         public OneCancelsTheOther()
         {
             TakeProfit = new Order();
@@ -14,9 +14,8 @@ namespace KBroker
 
         private bool WaitForBetterPrice(Broker broker, decimal currentPrice, decimal? lastPrice)
         {
-            RepeatedLastPrice += lastPrice == currentPrice ? 1 : - RepeatedLastPrice;
             if (TakeProfit.PlainGreed)
-                return lastPrice.HasValue && currentPrice >= lastPrice && RepeatedLastPrice <= 3 ;
+                return lastPrice.HasValue && currentPrice >= lastPrice && !FailedToSellGreedyTakeprofit;
             else if (TakeProfit.BeGreedy)
                 return !broker.PriceLostTooMuchGains(currentPrice, TakeProfit.Price.Value);
             else
@@ -30,6 +29,7 @@ namespace KBroker
                 dynamic response = null;
                 Price lastPrice = broker.LastPriceId == 0 ? null : broker.Prices[broker.LastPriceId]; ;
                 Price price = broker.GetCurrentPrice();
+                FailedToSellGreedyTakeprofit = price.Close < TakeProfit.Price && broker.MaxPrice.Close > 0;
                 broker.PercentageDone = Display.PrintProgress(
                     StopLoss.Pair, 
                     TakeProfit.Price.Value,

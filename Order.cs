@@ -17,6 +17,7 @@ namespace KBroker
         public bool IsEdit { get; set; }
         public bool IsOkay { get; set; }
         public bool IsOpen { get; set; }
+        public bool IsShadow { get; set; }
         public bool BeGreedy { get; set; }
         public bool PlainGreed { get; set; }
         public bool Error { get; set; }
