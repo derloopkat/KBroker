@@ -4,7 +4,7 @@
   "order": {
     "type": "OneCancelsTheOther",
     "pair": "FOOUSD",
-    "_startPrice": 15,
+    "startPrice": 15,
     "stoploss": {
       "id": "XXXXXX-XXXXX-123456",
       "volume": 1

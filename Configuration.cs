@@ -7,42 +7,50 @@ namespace KBroker
 {
     public class Configuration
     {
+        public const string OrdersFileName = "orders.json";
         public static int Timeout;
         public static float IntervalSeconds;
         public static string Pair;
         public static Trigger Trigger;
 
-        public static Trigger LoadSettings()
+        public static Trigger LoadOrders()
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("settings.json", optional: false, reloadOnChange: true);
-            var root = builder.Build();
-            var orderSection = root.GetSection("order");
-            var triggerType = orderSection.GetSection("type").Value;
-            var startPrice = orderSection.GetSection("startPrice");
-            Timeout = int.Parse(root.GetSection("timeout").Value);
-            IntervalSeconds = float.Parse(root.GetSection("interval").Value);
-            Pair = orderSection.GetSection("pair").Value;
-            if (triggerType == "OneCancelsTheOther")
+            try
             {
-                var trigger = new OneCancelsTheOther();
-                SetupStopLossOrder(trigger, orderSection.GetSection("stoploss"));
-                SetupTakeProfitOrder(trigger, orderSection.GetSection("takeprofit"));
-                Trigger = trigger;
-            }
-            else if(triggerType == "TrailingStopLoss")
-            {
-                var trigger = new TrailingStopLoss();
-                SetupStopLossOrder(trigger, orderSection.GetSection("stoploss"));
-                Trigger = trigger;
-            }
+                var builder = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile(OrdersFileName, optional: false, reloadOnChange: true);
+                var root = builder.Build();
+                var orderSection = root.GetSection("order");
+                var triggerType = orderSection.GetSection("type").Value;
+                var startPrice = orderSection.GetSection("startPrice");
+                Timeout = int.Parse(root.GetSection("timeout").Value);
+                IntervalSeconds = float.Parse(root.GetSection("interval").Value);
+                Pair = orderSection.GetSection("pair").Value;
+                if (triggerType == "OneCancelsTheOther")
+                {
+                    var trigger = new OneCancelsTheOther();
+                    SetupStopLossOrder(trigger, orderSection.GetSection("stoploss"));
+                    SetupTakeProfitOrder(trigger, orderSection.GetSection("takeprofit"));
+                    Trigger = trigger;
+                }
+                else if (triggerType == "TrailingStopLoss")
+                {
+                    var trigger = new TrailingStopLoss();
+                    SetupStopLossOrder(trigger, orderSection.GetSection("stoploss"));
+                    Trigger = trigger;
+                }
 
-            if (startPrice.Exists())
-            {
-                Trigger.StartPrice = decimal.Parse(startPrice.Value);
+                if (startPrice.Exists())
+                {
+                    Trigger.StartPrice = decimal.Parse(startPrice.Value);
+                }
+                LoadKeys();
             }
-            LoadKeys();
+            catch (Exception ex)
+            {
+                throw new ConfigurationException(ex.Message);
+            }
             return Trigger;
         }
 

@@ -12,7 +12,7 @@ namespace KBroker
         {
             Program.FirstRun = DateTime.Now;
             Display.PrintCredits();
-            var trigger = Configuration.LoadSettings();
+            var trigger = Configuration.LoadOrders();
             var stopLossWasAddedByUser = trigger.StopLoss.IsPlaced;
 
             /* Comment or uncomment the following code */
