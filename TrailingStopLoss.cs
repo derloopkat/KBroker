@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace KBroker
 {
-    public class TrailingStopLoss : Trigger
+    public class TrailingStopLoss : Operation
     {
         public TrailingStopLoss()
         {

@@ -7,13 +7,14 @@ using System.Threading.Tasks;
 
 namespace KBroker
 {
-    public abstract class Trigger
+    public abstract class Operation
     {
         public abstract void Execute(Broker broker);
         public bool TasksCompleted { get; set; }
         public Order TakeProfit { get; set; }
         public Order StopLoss { get; set; }
         public decimal? StartPrice { get; set; }
+        public float? Version { get; set; }
         public dynamic SetupOrders(Broker broker)
         {
             dynamic response = null;

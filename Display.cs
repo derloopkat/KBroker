@@ -241,27 +241,27 @@ namespace KBroker
             Console.ResetColor();
         }
 
-        public static void PrintHeader(Broker broker, Trigger trigger)
+        public static void PrintHeader(Broker broker, Operation operation)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine($"Pair: {broker.Pair}");
-            if (trigger.StopLoss.Price.HasValue)
+            if (operation.StopLoss.Price.HasValue)
             {
-                Console.WriteLine($"Stop loss: {trigger.StopLoss.Price}");
+                Console.WriteLine($"Stop loss: {operation.StopLoss.Price}");
             }
 
-            if (trigger is OneCancelsTheOther)
+            if (operation is OneCancelsTheOther)
             {
-                if(trigger.TakeProfit != null)
+                if(operation.TakeProfit != null)
                 {
-                    Console.WriteLine($"Take profit: {trigger.TakeProfit.Price}");
-                    Console.WriteLine($"Volume: {trigger.TakeProfit.Volume}");
+                    Console.WriteLine($"Take profit: {operation.TakeProfit.Price}");
+                    Console.WriteLine($"Volume: {operation.TakeProfit.Volume}");
                 }
             }
-            else if(trigger is TrailingStopLoss)
+            else if(operation is TrailingStopLoss)
             {
-                Console.WriteLine($"Stop loss trailing: {String.Join(", ", trigger.StopLoss.TrailingLevels)}");
-                Console.WriteLine($"Volume: {trigger.StopLoss.Volume}");
+                Console.WriteLine($"Stop loss trailing: {String.Join(", ", operation.StopLoss.TrailingLevels)}");
+                Console.WriteLine($"Volume: {operation.StopLoss.Volume}");
             }
             if (broker is Simulator)
             {

@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace KBroker
 {
-    public class OneCancelsTheOther : Trigger
+    public class OneCancelsTheOther : Operation
     {
         private bool FailedToSellGreedyTakeprofit = false;
         public OneCancelsTheOther()

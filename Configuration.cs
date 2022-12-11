@@ -7,13 +7,13 @@ namespace KBroker
 {
     public class Configuration
     {
-        public const string OrdersFileName = "orders.json";
+        public const string OrdersFileName = "operation.json";
         public static int Timeout;
         public static float IntervalSeconds;
         public static string Pair;
-        public static Trigger Trigger;
+        public static Operation Operation;
 
-        public static Trigger LoadOrders()
+        public static Operation LoadOrders()
         {
             try
             {
@@ -21,29 +21,35 @@ namespace KBroker
                     .SetBasePath(Directory.GetCurrentDirectory())
                     .AddJsonFile(OrdersFileName, optional: false, reloadOnChange: true);
                 var root = builder.Build();
-                var orderSection = root.GetSection("order");
-                var triggerType = orderSection.GetSection("type").Value;
-                var startPrice = orderSection.GetSection("startPrice");
+                var operationSection = root.GetSection("operation");
+                var operationType = operationSection.GetSection("type").Value;
+                var startPrice = operationSection.GetSection("startPrice");
+                var version = root.GetSection("version");
                 Timeout = int.Parse(root.GetSection("timeout").Value);
                 IntervalSeconds = float.Parse(root.GetSection("interval").Value);
-                Pair = orderSection.GetSection("pair").Value;
-                if (triggerType == "OneCancelsTheOther")
+                Pair = operationSection.GetSection("pair").Value;
+                if (operationType == "OneCancelsTheOther")
                 {
-                    var trigger = new OneCancelsTheOther();
-                    SetupStopLossOrder(trigger, orderSection.GetSection("stoploss"));
-                    SetupTakeProfitOrder(trigger, orderSection.GetSection("takeprofit"));
-                    Trigger = trigger;
+                    var operation = new OneCancelsTheOther();
+                    SetupStopLossOrder(operation, operationSection.GetSection("stoploss"));
+                    SetupTakeProfitOrder(operation, operationSection.GetSection("takeprofit"));
+                    Operation = operation;
                 }
-                else if (triggerType == "TrailingStopLoss")
+                else if (operationType == "TrailingStopLoss")
                 {
-                    var trigger = new TrailingStopLoss();
-                    SetupStopLossOrder(trigger, orderSection.GetSection("stoploss"));
-                    Trigger = trigger;
+                    var operation = new TrailingStopLoss();
+                    SetupStopLossOrder(operation, operationSection.GetSection("stoploss"));
+                    Operation = operation;
                 }
 
                 if (startPrice.Exists())
                 {
-                    Trigger.StartPrice = decimal.Parse(startPrice.Value);
+                    Operation.StartPrice = decimal.Parse(startPrice.Value);
+                }
+
+                if (version.Exists())
+                {
+                    Operation.Version = float.Parse(root.GetSection("version").Value);
                 }
                 LoadKeys();
             }
@@ -51,7 +57,7 @@ namespace KBroker
             {
                 throw new ConfigurationException(ex.Message);
             }
-            return Trigger;
+            return Operation;
         }
 
         private static void LoadKeys()
@@ -64,39 +70,39 @@ namespace KBroker
             KrakenApi.ApiPublicKey = root.GetSection("apiPublicKey").Value;
         }
 
-        private static void SetupTakeProfitOrder(Trigger trigger, IConfiguration section)
+        private static void SetupTakeProfitOrder(Operation operation, IConfiguration section)
         {
             var id = section.GetSection("id");
             if (id.Exists())
             {
-                trigger.TakeProfit.Id = id.Value;
+                operation.TakeProfit.Id = id.Value.Trim();
             }
             else
             {
                 var volume = section.GetSection("volume");
                 var greedy = section.GetSection("greedy")?.Value ?? "false";
                 var plainGreed = section.GetSection("plainGreed")?.Value ?? "false";
-                trigger.TakeProfit.OrderType = OrderType.Market;
-                trigger.TakeProfit.SideType = OrderSide.Sell;
-                trigger.TakeProfit.Price = decimal.Parse(section.GetSection("price").Value);
-                trigger.TakeProfit.BeGreedy = bool.Parse(greedy);
-                trigger.TakeProfit.PlainGreed = bool.Parse(plainGreed);
-                trigger.TakeProfit.Pair = section.GetSection("pair").Exists() ? section.GetSection("pair").Value : Pair;
+                operation.TakeProfit.OrderType = OrderType.Market;
+                operation.TakeProfit.SideType = OrderSide.Sell;
+                operation.TakeProfit.Price = decimal.Parse(section.GetSection("price").Value);
+                operation.TakeProfit.BeGreedy = bool.Parse(greedy);
+                operation.TakeProfit.PlainGreed = bool.Parse(plainGreed);
+                operation.TakeProfit.Pair = section.GetSection("pair").Exists() ? section.GetSection("pair").Value : Pair;
 
                 if (volume.Exists())
                 {
-                    trigger.TakeProfit.Volume = decimal.Parse(section.GetSection("volume").Value);
+                    operation.TakeProfit.Volume = decimal.Parse(section.GetSection("volume").Value);
                 }
                 else
                 {
-                    trigger.TakeProfit.Volume ??= trigger.StopLoss.Volume;
+                    operation.TakeProfit.Volume ??= operation.StopLoss.Volume;
                 }
             }
         }
 
-        private static void SetupStopLossOrder(Trigger trigger, IConfigurationSection section)
+        private static void SetupStopLossOrder(Operation operation, IConfigurationSection section)
         {
-            var order = trigger.StopLoss;
+            var order = operation.StopLoss;
             var id = section.GetSection("id");
             var edit = section.GetSection("edit");
             var price = section.GetSection("price");
@@ -105,7 +111,7 @@ namespace KBroker
             
             if (id.Exists())
             {
-                order.Id = id.Value;
+                order.Id = id.Value.Trim();
                 order.IsPlaced = true;
             }
             else

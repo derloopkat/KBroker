@@ -50,19 +50,19 @@ namespace KBroker
             }
         }
 
-        public void Trade(Trigger trigger)
+        public void Trade(Operation operation)
         {
             int seconds(double value) => (int)(value * 1000);
-            while (!trigger.TasksCompleted)
+            while (!operation.TasksCompleted)
             {
                 var done = this.PercentageDone;
                 var wait = done >= 93 && done <= 95 ? Math.Min(seconds(8), IntervalMiliseconds)
-                        : done >= 96 && done <= 104 ? Math.Min(seconds(trigger.TakeProfit.PlainGreed ? 6 : 3), IntervalMiliseconds)
+                        : done >= 96 && done <= 104 ? Math.Min(seconds(operation.TakeProfit.PlainGreed ? 6 : 3), IntervalMiliseconds)
                         : done >= 105 && done <= 110 ? Math.Min(seconds(8), IntervalMiliseconds)
                         : done >= 111 && done <= 120 ? Math.Min(seconds(16), IntervalMiliseconds)
                         : IntervalMiliseconds;
                 //System.Diagnostics.Debug.Print(wait.ToString());
-                trigger.Execute(this);
+                operation.Execute(this);
                 Thread.Sleep(wait);
             }
         }

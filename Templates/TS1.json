@@ -1,7 +1,8 @@
 {
   "timeout": 6000,
   "interval": 1,
-  "order": {
+  "version": 1.0,
+  "operation": {
     "type": "TrailingStopLoss",
     "pair": "FOOUSD",
     "stoploss": {

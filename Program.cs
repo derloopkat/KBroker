@@ -12,8 +12,8 @@ namespace KBroker
         {
             Program.FirstRun = DateTime.Now;
             Display.PrintCredits();
-            var trigger = Configuration.LoadOrders();
-            var stopLossWasAddedByUser = trigger.StopLoss.IsPlaced;
+            var operation = Configuration.LoadOrders();
+            var stopLossWasAddedByUser = operation.StopLoss.IsPlaced;
 
             /* Comment or uncomment the following code */
             /* This line is for running simulation with fake broker */
@@ -27,24 +27,24 @@ namespace KBroker
             ///* Above line is running the application for real  */
             //var broker = new Broker();
 
-            broker.WaitForStartPrice(broker.Pair, trigger.StartPrice ?? 0);
+            broker.WaitForStartPrice(broker.Pair, operation.StartPrice ?? 0);
 
-            var response = trigger.SetupOrders(broker);
-            if (!trigger.StopLoss.Error)
+            var response = operation.SetupOrders(broker);
+            if (!operation.StopLoss.Error)
             {
-                Display.PrintHeader(broker, trigger);
+                Display.PrintHeader(broker, operation);
             }
             else
                 Display.Print(response);
 
-            if (!stopLossWasAddedByUser) Display.AddOrderResponse(trigger.StopLoss, response);
+            if (!stopLossWasAddedByUser) Display.AddOrderResponse(operation.StopLoss, response);
 
             if (broker is not Simulator && broker.GetSystemStatus() != Broker.SystemStatus.Online)
             {
                 throw new SystemStatusException("Exchange unavailable or under maintenance.");
             }
 
-            broker.Trade(trigger);
+            broker.Trade(operation);
 
             Console.ReadLine();
 
@@ -58,15 +58,15 @@ namespace KBroker
             //var response = broker.AddOrder(order);
             //Display.Print(response);
 
-            //var trigger = Configuration.LoadSettings();
+            //var operation = Configuration.LoadSettings();
             //var broker = new Simulator(Configuration.Pair, 87, SimulatedPriceTrend.MockedAscending);
             //var intervalMiliseconds = 10000;
-            //trigger.Setup(broker);
-            //Display.PrintHeader(broker, trigger);
+            //operation.Setup(broker);
+            //Display.PrintHeader(broker, operation);
 
-            //while (!trigger.TasksCompleted)
+            //while (!operation.TasksCompleted)
             //{
-            //    trigger.Execute(broker);
+            //    operation.Execute(broker);
             //    Thread.Sleep(intervalMiliseconds);
             //}
 
