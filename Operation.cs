@@ -11,6 +11,7 @@ namespace KBroker
     {
         public abstract void Execute(Broker broker);
         public bool TasksCompleted { get; set; }
+        public bool UseMarketPrice { get; set; }
         public Order TakeProfit { get; set; }
         public Order StopLoss { get; set; }
         public decimal? StartPrice { get; set; }

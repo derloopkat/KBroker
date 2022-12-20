@@ -1,6 +1,7 @@
 {
   "timeout": 8000,
   "interval": 1,
+  "version": 1.0,
   "operation": {
     "type": "OneCancelsTheOther",
     "pair": "FOOUSD",
@@ -12,7 +13,7 @@
     "takeprofit": {
       "price": 16,
       "volume": 1,
-      "plainGreed": true
+      "greedy": true
     }
   }
 }

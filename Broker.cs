@@ -95,7 +95,9 @@ namespace KBroker
             try
             {
                 ulong currentPriceId = LastPriceId;
-                string jsonResponse = KrakenApi.QueryPublicEndpoint("OHLC", $"pair={Pair}&since={LastPriceId}").Result;
+                string jsonResponse = Configuration.Operation.UseMarketPrice ?
+                    KrakenApi.QueryPublicEndpoint("Ticker", $"pair={Pair}").Result :
+                    KrakenApi.QueryPublicEndpoint("OHLC", $"pair={Pair}&since={LastPriceId}").Result;
                 var body = JsonConvert.DeserializeObject<dynamic>(jsonResponse);
                 errors = body.error.ToObject<string[]>();
 
@@ -103,11 +105,20 @@ namespace KBroker
                 {
                     var alterPair = "X" + Pair.Substring(0, Pair.Length - 3) + "Z" + Pair.Substring(Pair.Length - 3);
                     var pairs = body.result[Pair] ?? body.result[alterPair];
-                    foreach (var pair in pairs)
+                    if (Configuration.Operation.UseMarketPrice)
                     {
-                        var price = new Price(pair);
+                        var price = new Price(decimal.Parse(pairs.b.First.Value));
                         currentPriceId = price.Id;
                         Prices[currentPriceId] = price;
+                    }
+                    else
+                    {
+                        foreach (var pair in pairs)
+                        {
+                            var price = new Price(pair);
+                            currentPriceId = price.Id;
+                            Prices[currentPriceId] = price;
+                        }
                     }
                     LastPriceId = currentPriceId;
                 }

@@ -49,7 +49,7 @@ namespace KBroker
                 else if (PriceTrend == SimulatedPriceTrend.MockedDescending)
                     CurrentPrice -= step;
                 else if (PriceTrend == SimulatedPriceTrend.UseRealPrice)
-                    return base.GetCurrentPrice();
+                    CurrentPrice = base.GetCurrentPrice().Close;
 
                 LastPriceId = (ulong)Prices.Values.Count;
                 Prices[LastPriceId] = new Price(CurrentPrice);

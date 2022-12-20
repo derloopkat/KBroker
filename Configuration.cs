@@ -24,6 +24,7 @@ namespace KBroker
                 var operationSection = root.GetSection("operation");
                 var operationType = operationSection.GetSection("type").Value;
                 var startPrice = operationSection.GetSection("startPrice");
+                var useMarketPrice = operationSection.GetSection("useMarketPrice")?.Value ?? "false";
                 var version = root.GetSection("version");
                 Timeout = int.Parse(root.GetSection("timeout").Value);
                 IntervalSeconds = float.Parse(root.GetSection("interval").Value);
@@ -51,6 +52,8 @@ namespace KBroker
                 {
                     Operation.Version = float.Parse(root.GetSection("version").Value);
                 }
+
+                Operation.UseMarketPrice = bool.Parse(useMarketPrice);
                 LoadKeys();
             }
             catch (Exception ex)
