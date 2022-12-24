@@ -18,17 +18,31 @@ namespace KBroker
 
         public Simulator(decimal currentPrice, SimulatedPriceTrend priceTrend = SimulatedPriceTrend.UseRealPrice, decimal? stopLossPrice = null)
         {
-            var id = "XXXXXX-XXXXX-123456";
+            var ids = new[] { "XXXXXX-XXXXX-123456", "XXXXXX-XXXXX-000001", "XXXXXX-XXXXX-000002" };
             if (stopLossPrice.HasValue)
             {
-                Orders[id] = new Order(id)
+                Orders.Add(ids.First(), new Order(ids.First())
                 {
                     OrderType = OrderType.StopLoss,
                     SideType = OrderSide.Sell,
                     Volume = 1,
                     Price = stopLossPrice
-                };
+                });
             }
+            Orders.Add(ids[1], new Order(ids[1])
+            {
+                OrderType = OrderType.Limit,
+                SideType = OrderSide.Sell,
+                Price = stopLossPrice * 1.1m,
+                Volume = 0.5m
+            });
+            Orders.Add(ids[2], new Order(ids[2])
+            {
+                OrderType = OrderType.Limit,
+                SideType = OrderSide.Sell,
+                Volume = 0.5m,
+                Price = stopLossPrice * 1.2m,
+            });
             CurrentPrice = currentPrice;
             MaxPrice = new Price(0);
             PriceTrend = priceTrend;

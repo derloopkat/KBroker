@@ -1,14 +1,19 @@
 {
-  "timeout": 6000,
+  "timeout": 8000,
   "interval": 1,
   "version": 1.0,
   "operation": {
-    "type": "TrailingStopLoss",
+    "type": "OneCancelsTheOther",
     "pair": "FOOUSD",
+    "startPrice": 15,
     "stoploss": {
       "id": "XXXXXX-XXXXX-123456",
+      "volume": 1
+    },
+    "takeprofit": {
+      "price": 16,
       "volume": 1,
-      "trailing": [ 15, 16, 17 ]
+      "greedy": true
     },
     "cancelOrders": [
       "XXXXXX-XXXXX-000001",

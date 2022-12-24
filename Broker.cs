@@ -235,7 +235,7 @@ namespace KBroker
             order.Error = response["error"].Count > 0;
             order.IsUnknown = response["error"].ToString().Contains("EOrder:Unknown order");
             order.IsClosed = response["result"]?["count"] == 1 || order.IsUnknown;
-            Logger.AddEntry($"AddOrder: {order.QueryString} \r\n{Convert.ToString(response)}");
+            Logger.AddEntry($"CancelOrder: {order.QueryString} \r\n{Convert.ToString(response)}");
             return response;
         }
 
@@ -250,7 +250,7 @@ namespace KBroker
             {
                 order.Id = response["result"]?["txid"]?.Value ?? order.Id;
             }
-            Logger.AddEntry($"AddOrder: {order.QueryString} {Environment.NewLine}{Convert.ToString(response)}");
+            Logger.AddEntry($"EditOrder: {order.QueryString} {Environment.NewLine}{Convert.ToString(response)}");
             return response;
         }
 

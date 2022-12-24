@@ -16,6 +16,7 @@ namespace KBroker
         public Order StopLoss { get; set; }
         public decimal? StartPrice { get; set; }
         public float? Version { get; set; }
+        public string[] CancelOrders { get; set; }
         public dynamic SetupOrders(Broker broker)
         {
             dynamic response = null;
@@ -24,6 +25,20 @@ namespace KBroker
                 if (broker is Simulator)
                 {
                     KrakenApi.ClearApiKeys();
+                }
+
+                if(CancelOrders != null)
+                {
+                    foreach (var id in CancelOrders)
+                    {
+                        var order = new Order(id);
+                        response = broker.CancelOrder(order);
+                        if (order.Error)
+                            Display.Print($"Unable to cancel order \"{order.Id}\".");
+                        else
+                            Display.PrintSuccess($"Order \"{order.Id}\" cancelled");
+                    }
+                    Display.Print(Environment.NewLine);
                 }
 
                 if (StopLoss.IsPlaced)
