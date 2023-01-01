@@ -60,7 +60,6 @@ namespace KBroker
                 }
 
                 Operation.UseMarketPrice = bool.Parse(useMarketPrice);
-                LoadKeys();
             }
             catch (Exception ex)
             {
@@ -69,7 +68,7 @@ namespace KBroker
             return Operation;
         }
 
-        private static void LoadKeys()
+        public static void LoadKeys()
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
@@ -114,6 +113,7 @@ namespace KBroker
             var order = operation.StopLoss;
             var id = section.GetSection("id");
             var edit = section.GetSection("edit");
+            var triggerBy = section.GetSection("triggerBy");
             var price = section.GetSection("price");
             var buyPrice = section.GetSection("buyPrice");
             var trailingLevels = section.GetSection("trailing");
@@ -136,6 +136,11 @@ namespace KBroker
             {
                 order.TriggerPrice = decimal.Parse(edit.GetSection("triggerPrice").Value);
                 order.NewStoplossPrice = decimal.Parse(edit.GetSection("newPrice").Value);
+            }
+
+            if (triggerBy.Exists())
+            {
+                order.TriggerBy = triggerBy.Value == "index" ? OrderTriggerBy.Index : OrderTriggerBy.Last;
             }
 
             if (trailingLevels.Exists())

@@ -6,9 +6,11 @@
     "type": "OneCancelsTheOther",
     "pair": "FOOUSD",
     "startPrice": 15,
+    "useMarketPrice": true,
     "stoploss": {
       "id": "XXXXXX-XXXXX-123456",
-      "volume": 1
+      "volume": 1,
+      "triggerBy": "index"
     },
     "takeprofit": {
       "price": 16,

@@ -11,7 +11,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Templates\CodeSamples.cs" />
+    <Compile Remove="Snippets\CreateOrder.cs" />
+    <Compile Remove="Snippets\EditOrder.cs" />
+    <Compile Remove="Snippets\SimulatorSamples.cs" />
+    <Compile Remove="Templates\_SimulatorSamples.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,7 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Templates\CodeSamples.cs" />
+    <Content Include="Snippets\CreateOrder.cs" />
+    <Content Include="Snippets\EditOrder.cs" />
+    <Content Include="Snippets\SimulatorSamples.cs" />
   </ItemGroup>
 
   <ItemGroup>

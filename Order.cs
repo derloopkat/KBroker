@@ -30,6 +30,7 @@ namespace KBroker
         public OrderSide? SideType { get;set; }
         public decimal? TriggerPrice { get; set; }
         public decimal? NewStoplossPrice { get; set; }
+        public OrderTriggerBy? TriggerBy { get; set; }
         public List<decimal> TrailingLevels { get; set; }
 
         public decimal? NextTrailingPrice 
@@ -95,10 +96,17 @@ namespace KBroker
                         { "type", SideType.GetDescription() },
                         { "volume", Volume.ToString() }
                     };
+
                     if(OrderType != KBroker.OrderType.Market)
                     {
                         post.Add("price", Price.ToString());
                     }
+
+                    if (TriggerBy.HasValue)
+                    {
+                        post.Add("trigger", TriggerBy.GetDescription());
+                    }
+
                     if (Validate)
                     {
                         post.Add("validate", true.ToString());

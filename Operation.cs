@@ -36,7 +36,7 @@ namespace KBroker
                         if (order.Error)
                             Display.Print($"Unable to cancel order \"{order.Id}\".");
                         else
-                            Display.PrintSuccess($"Order \"{order.Id}\" cancelled");
+                            Display.PrintSuccess($"Order \"{order.Id}\" was cancelled.");
                     }
                     Display.Print(Environment.NewLine);
                 }

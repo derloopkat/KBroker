@@ -18,6 +18,12 @@
         Buy
     }
 
+    public enum OrderTriggerBy
+    {
+        Last,
+        Index
+    }
+
     public enum SimulatedPriceTrend
     {
         UseRealPrice,
@@ -58,6 +64,19 @@
                     return "buy";
                 case OrderSide.Sell:
                     return "sell";
+                default:
+                    return null;
+            }
+        }
+
+        public static string GetDescription(this OrderTriggerBy? orderTriggerBy)
+        {
+            switch (orderTriggerBy)
+            {
+                case OrderTriggerBy.Last:
+                    return "last";
+                case OrderTriggerBy.Index:
+                    return "index";
                 default:
                     return null;
             }

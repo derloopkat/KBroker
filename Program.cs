@@ -15,8 +15,8 @@ namespace KBroker
             var operation = Configuration.LoadOrders();
             var stopLossWasAddedByUser = operation.StopLoss.IsPlaced;
 
-            /* Comment or uncomment the following code */
-            /* This line is for running simulation with fake broker */
+            ///* Comment or uncomment the following code */
+            ///* This line is for running simulation with fake broker */
             var broker = new Simulator
             (
                 currentPrice: 15.9m,
@@ -24,7 +24,8 @@ namespace KBroker
                 stopLossPrice: 13.727m
             );
 
-            ///* Above line is running the application for real  */
+            ///* Below two lines are running the application for real  */
+            // Configuration.LoadKeys();
             //var broker = new Broker();
 
             broker.WaitForStartPrice(broker.Pair, operation.StartPrice ?? 0);
@@ -47,37 +48,6 @@ namespace KBroker
             broker.Trade(operation);
 
             Console.ReadLine();
-
-            //var broker = new Broker();
-            //var order = new Order();
-            //order.Pair = "AVAXUSD";
-            //order.SideType = OrderSide.Sell;
-            //order.OrderType = OrderType.Market;
-            //order.Volume = 27.94624M;
-            //order.Validate = true;
-            //var response = broker.AddOrder(order);
-            //Display.Print(response);
-
-            //var operation = Configuration.LoadSettings();
-            //var broker = new Simulator(Configuration.Pair, 87, SimulatedPriceTrend.MockedAscending);
-            //var intervalMiliseconds = 10000;
-            //operation.Setup(broker);
-            //Display.PrintHeader(broker, operation);
-
-            //while (!operation.TasksCompleted)
-            //{
-            //    operation.Execute(broker);
-            //    Thread.Sleep(intervalMiliseconds);
-            //}
-
-            //var order = new Order("OUVRNM-FC6ZU-GRFAGD");
-            //order.Pair = "AVAXUSD";
-            //order.Price = 20;
-            //var response = broker.EditOrder(order);
-            //var response = broker.QueryOrder(order);
-            //Display.Print(response);
-
-
         }
     }
 }
