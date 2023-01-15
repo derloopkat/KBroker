@@ -17,7 +17,7 @@ namespace KBroker
             if (TakeProfit.PlainGreed)
                 return lastPrice.HasValue && currentPrice >= lastPrice && !FailedToSellGreedyTakeprofit;
             else if (TakeProfit.BeGreedy)
-                return !broker.PriceLostTooMuchGains(currentPrice, TakeProfit.Price.Value);
+                return !broker.PriceLostTooMuchGains(currentPrice, TakeProfit.Price.Value, UseMarketPrice);
             else
                 return false;
         }
