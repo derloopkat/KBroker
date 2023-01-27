@@ -25,7 +25,7 @@ namespace KBroker
             );
 
             ///* Below two lines are running the application for real  */
-            // Configuration.LoadKeys();
+            //Configuration.LoadSecretKeys();
             //var broker = new Broker();
 
             broker.WaitForStartPrice(broker.Pair, operation.StartPrice ?? 0);

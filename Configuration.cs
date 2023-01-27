@@ -68,7 +68,7 @@ namespace KBroker
             return Operation;
         }
 
-        public static void LoadKeys()
+        public static void LoadSecretKeys()
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())

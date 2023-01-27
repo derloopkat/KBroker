@@ -17,7 +17,7 @@ namespace KBroker
             if (TakeProfit.PlainGreed)
                 return lastPrice.HasValue && currentPrice >= lastPrice && !FailedToSellGreedyTakeprofit;
             else if (TakeProfit.BeGreedy)
-                return !broker.PriceLostTooMuchGains(currentPrice, TakeProfit.Price.Value, UseMarketPrice);
+                return !broker.PriceLostTooMuchGain(currentPrice, TakeProfit.Price.Value, UseMarketPrice);
             else
                 return false;
         }
@@ -27,7 +27,7 @@ namespace KBroker
             try
             {
                 dynamic response = null;
-                Price lastPrice = broker.LastPriceId == 0 ? null : broker.Prices[broker.LastPriceId]; ;
+                Price lastPrice = broker.LastPriceId == 0 ? null : broker.Prices[broker.LastPriceId];
                 Price price = broker.GetCurrentPrice();
                 FailedToSellGreedyTakeprofit = price.Close < TakeProfit.Price && broker.MaxPrice.Close > 0;
                 broker.PercentageDone = Display.PrintProgress(

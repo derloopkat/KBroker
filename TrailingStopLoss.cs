@@ -40,7 +40,7 @@ namespace KBroker
                     Display.PrintError($"Stoploss order was canceled by user.");
                     TasksCompleted = true;
                 }
-                else if (price.Close > StopLoss.TriggerTrailingPrice)
+                else if (price.Close >= StopLoss.TriggerTrailingPrice)
                 {
                     if (broker.GetSystemStatus() != Broker.SystemStatus.Online)
                     {

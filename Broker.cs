@@ -108,7 +108,7 @@ namespace KBroker
                     if (Configuration.Operation.UseMarketPrice)
                     {
                         var price = new Price(decimal.Parse(pairs.b.First.Value));
-                        currentPriceId = price.Id;
+                        currentPriceId = (ulong)DateTime.Now.Ticks;
                         Prices[currentPriceId] = price;
                     }
                     else
@@ -197,7 +197,7 @@ namespace KBroker
                     (order.OrderType != OrderType.StopLoss && order.OrderType != OrderType.Market ))
                 {
                     Display.Print($"WARNING: the current MARKET price is {symbol}{currentPrice.Close}. " +
-                                  $"Your {order.SideType.ToString().ToUpper()} order will be executed immediatelly. " + 
+                                  $"Your {order.SideType.ToString().ToUpper()} order will be executed immediatelly. " +
                                   $@"Make sure the ""{order.OrderType.GetDescription()}"" order price {symbol}{order.Price} is correct.", ConsoleColor.Yellow);
                 }
                 Display.Print($"Confirm submitting order {details} (Y/N) ", ConsoleColor.Cyan, true);
@@ -276,7 +276,7 @@ namespace KBroker
             return response;
         }
 
-        public bool PriceLostTooMuchGains(decimal currentPrice, decimal takeProfitPrice, bool useMarketPrice)
+        public bool PriceLostTooMuchGain(decimal currentPrice, decimal takeProfitPrice, bool useMarketPrice)
         {
             TimeSpan timeSinceMaxWasSet = MaxPrice.Created.HasValue ? MaxPrice.Created.Value - DateTime.Now : TimeSpan.MaxValue;
             decimal seekToKeepAtLeastThisPercentageFromGains = 
