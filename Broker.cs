@@ -244,7 +244,7 @@ namespace KBroker
             order.IsEdit = true;
             var json = KrakenApi.QueryPrivateEndpoint("EditOrder", order.QueryString).Result;
             var response = JsonConvert.DeserializeObject<dynamic>(json);
-            order.Error = response["error"].Count > 0 || response["result"]["status"].Value != "ok";
+            order.Error = response["error"].Count > 0 || response["result"]?["status"]?.Value != "ok";
             order.IsUnknown = response["error"].ToString().Contains("EOrder:Unknown order");
             if (!order.IsUnknown)
             {
@@ -258,11 +258,14 @@ namespace KBroker
         {
             var json = KrakenApi.QueryPrivateEndpoint("QueryOrders", order.QueryString).Result;
             var response = JsonConvert.DeserializeObject<dynamic>(json);
-            order.IsClosed = response["result"]?[order.Id]?["status"] == "closed";
-            order.IsCanceled = response["result"]?[order.Id]?["status"] == "canceled";
-            order.IsOkay = response["result"]?[order.Id]?["status"] == "ok";
-            order.IsOpen = response["result"]?[order.Id]?["status"] == "open";
+            var details = response["result"]?[order.Id];
+            var status = details?["status"];
+            order.IsClosed = status == "closed";
+            order.IsCanceled = status == "canceled";
+            order.IsOkay = status == "ok";
+            order.IsOpen = status == "open";
             order.IsUnknown = response["error"].ToString().Contains("EOrder:Unknown order");
+            //order.TriggerBy = details["trigger"] == "index" ? OrderTriggerBy.Index : OrderTriggerBy.Last;
             //order.Cost = response["result"]?[order.Id]?["cost"];
             if (order.IsClosed)
             {

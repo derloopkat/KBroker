@@ -81,15 +81,16 @@ namespace KBroker
         private static void SetupTakeProfitOrder(Operation operation, IConfiguration section)
         {
             var id = section.GetSection("id");
+            var volume = section.GetSection("volume");
+            var greedy = section.GetSection("greedy")?.Value ?? "false";
+            var plainGreed = section.GetSection("plainGreed")?.Value ?? "false";
+
             if (id.Exists())
             {
                 operation.TakeProfit.Id = id.Value.Trim();
             }
             else
             {
-                var volume = section.GetSection("volume");
-                var greedy = section.GetSection("greedy")?.Value ?? "false";
-                var plainGreed = section.GetSection("plainGreed")?.Value ?? "false";
                 operation.TakeProfit.OrderType = OrderType.Market;
                 operation.TakeProfit.SideType = OrderSide.Sell;
                 operation.TakeProfit.Price = decimal.Parse(section.GetSection("price").Value);
@@ -101,9 +102,13 @@ namespace KBroker
                 {
                     operation.TakeProfit.Volume = decimal.Parse(section.GetSection("volume").Value);
                 }
+                else if (operation.StopLoss.Volume.HasValue)
+                {
+                    operation.TakeProfit.Volume = operation.StopLoss.Volume;
+                }
                 else
                 {
-                    operation.TakeProfit.Volume ??= operation.StopLoss.Volume;
+                    throw new Exception("Details: takeprofit volume is mandatory unless it's specified for stoploss, in which case the same is assumed.");
                 }
             }
         }
@@ -111,12 +116,18 @@ namespace KBroker
         private static void SetupStopLossOrder(Operation operation, IConfigurationSection section)
         {
             var order = operation.StopLoss;
+            var pair = section.GetSection("pair");
             var id = section.GetSection("id");
             var edit = section.GetSection("edit");
             var triggerBy = section.GetSection("triggerBy");
             var price = section.GetSection("price");
-            var buyPrice = section.GetSection("buyPrice");
             var trailingLevels = section.GetSection("trailing");
+            var volume = section.GetSection("volume");
+
+            if (!pair.Exists())
+            {
+                throw new Exception("Details: pair is missing. Please specify pair e.g. \"BTCUSD\".");
+            }
             
             if (id.Exists())
             {
@@ -125,11 +136,16 @@ namespace KBroker
             }
             else
             {
+                if(!volume.Exists() || !price.Exists())
+                {
+                    throw new Exception("Details: price and volume are mandatory for creating a new order.");
+                }
+
                 order.OrderType = OrderType.StopLoss;
                 order.SideType = OrderSide.Sell;
                 order.Price = decimal.Parse(price.Value);
-                order.Volume = decimal.Parse(section.GetSection("volume").Value);
-                order.Pair = section.GetSection("pair").Exists() ? section.GetSection("pair").Value : Configuration.Pair;
+                order.Volume = decimal.Parse(volume.Value);
+                order.Pair = pair.Value.ToUpper();
             }
 
             if (edit.Exists())
