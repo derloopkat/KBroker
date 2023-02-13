@@ -16,21 +16,24 @@ namespace KBroker
                 Display.PrintCredits();
                 var operation = Configuration.LoadOrders();
                 var stopLossWasAddedByUser = operation.StopLoss.IsPlaced;
+                Broker broker;
+                
+                if (operation.Simulation != null)
+                {
+                    broker = new Simulator
+                    (
+                        currentPrice: operation.Simulation?.CurrentPrice ?? 0,
+                        priceTrend: operation.Simulation?.PriceTrend ?? 0,
+                        stopLossPrice: operation.StopLoss.Price
+                    );
+                }
+                else
+                {
+                    Configuration.LoadSecretKeys();
+                    broker = new Broker();
+                };
 
-                ///* Comment or uncomment the following code */
-                ///* This line is for running simulation with fake broker */
-                var broker = new Simulator
-                (
-                    currentPrice: 15.9m,
-                    priceTrend: SimulatedPriceTrend.MockedAscending,
-                    stopLossPrice: 13.727m
-                );
-
-                ///* Below two lines are running the application for real  */
-                //Configuration.LoadSecretKeys();
-                //var broker = new Broker();
-
-                broker.WaitForStartPrice(broker.Pair, operation.StartPrice ?? 0);
+                broker.WaitForStartPrice(operation.StartPrice ?? 0);
 
                 var response = operation.SetupOrders(broker);
                 if (!operation.StopLoss.Error)

@@ -21,6 +21,7 @@ namespace KBroker
                     .SetBasePath(Directory.GetCurrentDirectory())
                     .AddJsonFile(OrdersFileName, optional: false, reloadOnChange: true);
                 var root = builder.Build();
+                var simulationSection = root.GetSection("simulation");
                 var operationSection = root.GetSection("operation");
                 var pair = operationSection.GetSection("pair");
                 var operationType = operationSection.GetSection("type").Value;
@@ -36,7 +37,7 @@ namespace KBroker
 
                 Timeout = int.Parse(root.GetSection("timeout").Value);
                 IntervalSeconds = float.Parse(root.GetSection("interval").Value);
-                Pair = operationSection.GetSection("pair").Value.ToUpper();
+                Pair = pair.Value.ToUpper();
 
                 if (operationType == "OneCancelsTheOther")
                 {
@@ -65,6 +66,17 @@ namespace KBroker
                 if (cancelOrders.Exists())
                 {
                     Operation.CancelOrders = cancelOrders.GetChildren().Select(o => o.Value).ToArray();
+                }
+
+                if (simulationSection.Exists())
+                {
+                    var currentPrice = simulationSection.GetSection("currentPrice");
+                    var priceTrend = simulationSection.GetSection("priceTrend");
+                    Operation.Simulation = new Operation.SimulationConfiguration
+                    {
+                        CurrentPrice = decimal.Parse(currentPrice.Value),
+                        PriceTrend = (SimulatedPriceTrend)Enum.Parse(typeof(SimulatedPriceTrend), priceTrend.Value)
+                    };
                 }
 
                 Operation.UseMarketPrice = bool.Parse(useMarketPrice);

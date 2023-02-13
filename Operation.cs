@@ -17,6 +17,12 @@ namespace KBroker
         public decimal? StartPrice { get; set; }
         public float? Version { get; set; }
         public string[] CancelOrders { get; set; }
+        public SimulationConfiguration? Simulation { get; set; } 
+        public struct SimulationConfiguration
+        {
+            public decimal CurrentPrice;
+            public SimulatedPriceTrend PriceTrend;
+        }
         public dynamic SetupOrders(Broker broker)
         {
             dynamic response = null;

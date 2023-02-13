@@ -1,0 +1,27 @@
+{
+  "timeout": 8000,
+  "interval": 1,
+  "version": 1.0,
+  "simulation": {
+    "currentPrice": 15,
+    "priceTrend": "MockedAscending"
+  },
+  "operation": {
+    "type": "OneCancelsTheOther",
+    "pair": "FOOUSD",
+    "startPrice": 15,
+    "stoploss": {
+      "price": 14,
+      "volume": 1,
+      "edit": {
+        "triggerPrice": 15.5,
+        "newPrice": 15
+      }
+    },
+    "takeprofit": {
+      "price": 16,
+      "volume": 1,
+      "greedy": true
+    }
+  }
+}
