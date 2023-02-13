@@ -82,7 +82,7 @@ namespace KBroker
             if (ConfirmOrder(order))
             {
                 order.Id = $"XXXXXX-XXXXX-{Orders.Values.Count.ToString("######")}";
-                string json = $"{{\"error\": [ ],\"result\": {{\"descr\": {{\"order\": \"{order.SideType.GetDescription()} {order.Volume} {order.Pair} @ {order.OrderType.GetDescription()} {order.Price}\"}},\"txid\": [\"{order.Id}\"]}}}}";
+                string json = $"{{\"error\": [ ],\"result\": {{\"descr\": {{\"order\": \"{order.SideType.GetDescription()} {order.Volume} {Configuration.Pair} @ {order.OrderType.GetDescription()} {order.Price}\"}},\"txid\": [\"{order.Id}\"]}}}}";
                 Orders[order.Id] = order;
                 response = JsonConvert.DeserializeObject<dynamic>(json);
                 order.Error = response["error"].Count > 0;
@@ -120,7 +120,6 @@ namespace KBroker
             if (Orders.ContainsKey(order.Id))
             {
                 var remote = Orders[order.Id];
-                order.Pair = remote.Pair;
                 order.OrderType = remote.OrderType;
                 order.SideType = remote.SideType;
                 order.Volume = remote.Volume;
@@ -143,9 +142,9 @@ namespace KBroker
             if (Orders.ContainsKey(order.Id))
             {                
                 json =  $"{{\"error\": [ ],\"result\": {{\"{order.Id}\": {{\"status\": \"{(order.IsClosed ? "closed" : "open")}\"," +
-                        $"\"opentm\": {DateTimeOffset.UtcNow.ToUnixTimeSeconds()},\"descr\": {{\"pair\": \"{order.Pair}\",\"type\": \"{order.SideType.GetDescription()}\"," +
+                        $"\"opentm\": {DateTimeOffset.UtcNow.ToUnixTimeSeconds()},\"descr\": {{\"pair\": \"{Configuration.Pair}\",\"type\": \"{order.SideType.GetDescription()}\"," +
                         $"\"ordertype\": \"{order.OrderType.GetDescription()}\",\"price\": \"{order.Price}\",\"order\": \"{order.SideType.GetDescription()} " +
-                        $"{order.Volume} {order.Pair} @ {order.OrderType.GetDescription()} {order.Price}\",\"close\": \"\"}},\"vol\": \"{order.Volume}\", \"vol_exec\": " +
+                        $"{order.Volume} {Configuration.Pair} @ {order.OrderType.GetDescription()} {order.Price}\",\"close\": \"\"}},\"vol\": \"{order.Volume}\", \"vol_exec\": " +
                         $"\"{order.Volume}\",\"cost\": \"{order.Price * order.Volume}\",\"fee\": \"XX.X\",\"price\": \"{order.Price}\",\"stopprice\": \"0.00000\"," +
                         $"\"limitprice\": \"{order.Price}\",\"trigger\": \"index\"}}}}}}";
             }
@@ -170,7 +169,7 @@ namespace KBroker
             {
                 var status = "ok";
                 var newOrderId = $"XXXXXX-XXXXX-{DateTime.Now.Ticks}";
-                json = $"{{ \"error\": [], \"result\": {{ \"status\": \"{status}\",  \"txid\": \"{newOrderId}\",  \"originaltxid\": \"{order.Id}\",  \"price\": \"{order.Price}\",  \"orders_cancelled\": 1,  \"descr\": {{   \"order\": \"{order.SideType.GetDescription()} {order.Volume} {order.Pair} @ limit {order.Price}\"  }} }}}} ";
+                json = $"{{ \"error\": [], \"result\": {{ \"status\": \"{status}\",  \"txid\": \"{newOrderId}\",  \"originaltxid\": \"{order.Id}\",  \"price\": \"{order.Price}\",  \"orders_cancelled\": 1,  \"descr\": {{   \"order\": \"{order.SideType.GetDescription()} {order.Volume} {Configuration.Pair} @ limit {order.Price}\"  }} }}}} ";
 
             }
             else

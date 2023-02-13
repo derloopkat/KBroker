@@ -105,17 +105,22 @@ namespace KBroker
                 : "$";
         }
 
-        public static void PrintWaitingForStartPrice(string pair, decimal currentPrice, decimal initialPrice, decimal startPrice)
+        public static string GetCurrencySymbol()
+        {
+            return GetCurrencySymbol(Configuration.Pair);
+        }
+
+        public static void PrintWaitingForStartPrice(decimal currentPrice, decimal initialPrice, decimal startPrice)
         {
             const int uniqueFrames = 3;
             var frames = new List<string>() { "\u25A0  ", " \u25A0 ", "  \u25A0", " \u25A0 ", "\u25A0  " };  // "|/-\\|";
             var timeStamp = DateTime.Now.ToLongTimeString();
-            var symbol = GetCurrencySymbol(pair);
+            var symbol = GetCurrencySymbol();
             var priceColor = currentPrice < initialPrice ? ConsoleColor.Red
                 : currentPrice > initialPrice ? ConsoleColor.Green
                 : ConsoleColor.Yellow;
             Print($"{timeStamp} ", ConsoleColor.White, true);
-            Print($"{pair} ", ConsoleColor.Gray, true);
+            Print($"{Configuration.Pair} ", ConsoleColor.Gray, true);
             Print($"Start: ", ConsoleColor.White, true);
             Print($"{symbol}{startPrice} ", ConsoleColor.Cyan, true);
             Print($"Current: ", ConsoleColor.White, true);
@@ -128,7 +133,7 @@ namespace KBroker
             Print("\r", ConsoleColor.Black, true);
         }
 
-        public static int PrintProgress(string pair, decimal takeProfitPrice, decimal stopLossPrice, decimal currentPrice, decimal lastPrice)
+        public static int PrintProgress(decimal takeProfitPrice, decimal stopLossPrice, decimal currentPrice, decimal lastPrice)
         {
             var timeStamp = DateTime.Now.ToLongTimeString();
             int percentageDone;
@@ -139,11 +144,11 @@ namespace KBroker
                 : currentIndex <= 10 ? ConsoleColor.Green
                 : ConsoleColor.Cyan;
             Print($"{timeStamp} ", ConsoleColor.White, true);
-            Print($"{pair} Progress", ConsoleColor.Gray, true);
+            Print($"{Configuration.Pair} Progress", ConsoleColor.Gray, true);
             Print($" {progress} ", chartColor, true);
             Print(percentageDone < 10 ? "   " : percentageDone < 100 ? "  " : " ", ConsoleColor.Black, true);
             Print($"Close: ", ConsoleColor.Gray, true);
-            Print($"{GetCurrencySymbol(pair)}", ConsoleColor.Gray, true);
+            Print($"{GetCurrencySymbol(Configuration.Pair)}", ConsoleColor.Gray, true);
             PrintPrice(currentPrice, lastPrice);
             Print("");
             ShowProgressInTaskBar(percentageDone);
@@ -243,30 +248,35 @@ namespace KBroker
 
         public static void PrintHeader(Broker broker, Operation operation)
         {
+            var symbol = GetCurrencySymbol();
+            var stopLoss = operation.StopLoss;
+            var takeProfit = operation.TakeProfit;
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"Pair: {broker.Pair}");
-            if (operation.StopLoss.Price.HasValue)
+            Console.WriteLine($"Pair: {Configuration.Pair}");
+            if (stopLoss.Price.HasValue)
             {
-                Console.WriteLine($"Stop loss: {operation.StopLoss.Price}");
+                var triggerBy = operation.UseMarketPrice ? "market" : "last";
+                var edit = stopLoss.TriggerPrice.HasValue ? $"change to {symbol}{stopLoss.NewStoplossPrice} when {triggerBy} price is {symbol}{stopLoss.TriggerPrice}" : "";
+                Console.WriteLine($"Stop loss: {symbol}{stopLoss.Price} {edit}");
             }
 
             if (operation is OneCancelsTheOther)
             {
-                if(operation.TakeProfit != null)
+                if (takeProfit != null)
                 {
-                    Console.WriteLine($"Take profit: {operation.TakeProfit.Price}");
-                    Console.WriteLine($"Volume: {operation.TakeProfit.Volume}");
+                    var greed = takeProfit.BeGreedy | takeProfit.PlainGreed ? "(greedy)" : "";
+                    Console.WriteLine($"Take profit: {symbol}{takeProfit.Price} {greed}");
+                    Console.WriteLine($"Volume: {takeProfit.Volume}");
                 }
             }
             else if(operation is TrailingStopLoss)
             {
-                Console.WriteLine($"Stop loss trailing: {String.Join(", ", operation.StopLoss.TrailingLevels)}");
-                Console.WriteLine($"Volume: {operation.StopLoss.Volume}");
+                Console.WriteLine($"Stop loss trailing: {String.Join(", ", stopLoss.TrailingLevels)}");
+                Console.WriteLine($"Volume: {stopLoss.Volume}");
             }
             if (broker is Simulator)
             {
-                Console.WriteLine();
-                Console.WriteLine($"-->> This is a simulation <<--");
+                Print($"{Environment.NewLine} *** This is a simulation *** ", ConsoleColor.White, ConsoleColor.Red);
             }
             Console.WriteLine();
             Console.ResetColor();

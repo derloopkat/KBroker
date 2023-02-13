@@ -3,7 +3,7 @@
 Configuration.LoadKeys();
 var broker = new Broker();
 var order = new Order();
-order.Pair = "LRCUSD";
+Configuration.Pair = "LRCUSD";
 order.SideType = OrderSide.Sell;
 order.OrderType = OrderType.StopLoss;
 order.Volume = 100M;

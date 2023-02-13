@@ -70,7 +70,7 @@ namespace KBroker
                         var post = new Dictionary<string, string>()
                         {
                             { "txid", Id },
-                            { "pair", Pair },
+                            { "pair", Configuration.Pair },
                             { "price", Price.ToString() }
                         };
                         if (Volume.HasValue)
@@ -92,7 +92,7 @@ namespace KBroker
                     var post = new Dictionary<string, string>()
                     {
                         { "ordertype", OrderType.GetDescription() },
-                        { "pair", Pair },
+                        { "pair", Configuration.Pair },
                         { "type", SideType.GetDescription() },
                         { "volume", Volume.ToString() }
                     };

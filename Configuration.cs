@@ -22,14 +22,22 @@ namespace KBroker
                     .AddJsonFile(OrdersFileName, optional: false, reloadOnChange: true);
                 var root = builder.Build();
                 var operationSection = root.GetSection("operation");
+                var pair = operationSection.GetSection("pair");
                 var operationType = operationSection.GetSection("type").Value;
                 var startPrice = operationSection.GetSection("startPrice");
                 var useMarketPrice = operationSection.GetSection("useMarketPrice")?.Value ?? "false";
                 var cancelOrders = operationSection.GetSection("cancelOrders");
                 var version = root.GetSection("version");
+
+                if (!pair.Exists())
+                {
+                    throw new Exception("Details: pair is missing. Please specify pair e.g. \"BTCUSD\".");
+                }
+
                 Timeout = int.Parse(root.GetSection("timeout").Value);
                 IntervalSeconds = float.Parse(root.GetSection("interval").Value);
-                Pair = operationSection.GetSection("pair").Value;
+                Pair = operationSection.GetSection("pair").Value.ToUpper();
+
                 if (operationType == "OneCancelsTheOther")
                 {
                     var operation = new OneCancelsTheOther();
@@ -96,7 +104,7 @@ namespace KBroker
                 operation.TakeProfit.Price = decimal.Parse(section.GetSection("price").Value);
                 operation.TakeProfit.BeGreedy = bool.Parse(greedy);
                 operation.TakeProfit.PlainGreed = bool.Parse(plainGreed);
-                operation.TakeProfit.Pair = section.GetSection("pair").Exists() ? section.GetSection("pair").Value : Pair;
+                operation.TakeProfit.Pair = Configuration.Pair;
 
                 if (volume.Exists())
                 {
@@ -116,19 +124,14 @@ namespace KBroker
         private static void SetupStopLossOrder(Operation operation, IConfigurationSection section)
         {
             var order = operation.StopLoss;
-            var pair = section.GetSection("pair");
             var id = section.GetSection("id");
             var edit = section.GetSection("edit");
             var triggerBy = section.GetSection("triggerBy");
             var price = section.GetSection("price");
             var trailingLevels = section.GetSection("trailing");
             var volume = section.GetSection("volume");
+            order.Pair = Pair;
 
-            if (!pair.Exists())
-            {
-                throw new Exception("Details: pair is missing. Please specify pair e.g. \"BTCUSD\".");
-            }
-            
             if (id.Exists())
             {
                 order.Id = id.Value.Trim();
@@ -145,7 +148,6 @@ namespace KBroker
                 order.SideType = OrderSide.Sell;
                 order.Price = decimal.Parse(price.Value);
                 order.Volume = decimal.Parse(volume.Value);
-                order.Pair = pair.Value.ToUpper();
             }
 
             if (edit.Exists())

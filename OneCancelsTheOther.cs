@@ -31,7 +31,6 @@ namespace KBroker
                 Price price = broker.GetCurrentPrice();
                 FailedToSellGreedyTakeprofit = price.Close < TakeProfit.Price && broker.MaxPrice.Close > 0;
                 broker.PercentageDone = Display.PrintProgress(
-                    StopLoss.Pair, 
                     TakeProfit.Price.Value,
                     StopLoss.Price.Value, 
                     price.Close, 

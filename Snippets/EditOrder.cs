@@ -14,8 +14,8 @@ while (!operation.TasksCompleted)
     Thread.Sleep(intervalMiliseconds);
 }
 
-var order = new Order("OUVRNM-FC6ZU-GRFAGD");
-order.Pair = "AVAXUSD";
+var order = new Order("XXXXXX-XXXXX-XXXX");
+Configuration.Pair = "FOOUSD";
 order.Price = 20;
 var response = broker.EditOrder(order);
 //var response = broker.QueryOrder(order);

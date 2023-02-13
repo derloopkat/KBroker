@@ -47,8 +47,14 @@ namespace KBroker
                     if (StopLoss.IsOpen)
                     {
                         StopLoss.Price = decimal.Parse(response["result"][StopLoss.Id]["descr"]?["price"].Value);
-                        StopLoss.Pair = response["result"]?[StopLoss.Id]?["descr"]?["pair"].Value;
                         StopLoss.Volume = decimal.Parse(response["result"][StopLoss.Id]["vol"].Value);
+                        StopLoss.Pair = response["result"]?[StopLoss.Id]?["descr"]?["pair"].Value;
+                        if(Configuration.Pair != StopLoss.Pair)
+                        {
+                            Display.PrintError($"Pair mismatch. Stoploss order is {StopLoss.Pair} while operation was setup to work with {Configuration.Pair}.");
+                            StopLoss.Error = true;
+                        }
+
                     }
                     else
                     {

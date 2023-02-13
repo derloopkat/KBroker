@@ -30,18 +30,6 @@ namespace KBroker
             MaxPrice = new Price(0);
         }
 
-        public string Pair
-        {
-            get
-            {
-                return Configuration.Pair;
-            }
-            set
-            {
-                Configuration.Pair = value;
-            }
-        }
-
         public int IntervalMiliseconds
         {
             get
@@ -94,28 +82,29 @@ namespace KBroker
             string[] errors = null;
             try
             {
+                var pair = Configuration.Pair;
                 ulong currentPriceId = LastPriceId;
                 string jsonResponse = Configuration.Operation.UseMarketPrice ?
-                    KrakenApi.QueryPublicEndpoint("Ticker", $"pair={Pair}").Result :
-                    KrakenApi.QueryPublicEndpoint("OHLC", $"pair={Pair}&since={LastPriceId}").Result;
+                    KrakenApi.QueryPublicEndpoint("Ticker", $"pair={pair}").Result :
+                    KrakenApi.QueryPublicEndpoint("OHLC", $"pair={pair}&since={LastPriceId}").Result;
                 var body = JsonConvert.DeserializeObject<dynamic>(jsonResponse);
                 errors = body.error.ToObject<string[]>();
 
                 if (errors.Length == 0)
                 {
-                    var alterPair = "X" + Pair.Substring(0, Pair.Length - 3) + "Z" + Pair.Substring(Pair.Length - 3);
-                    var pairs = body.result[Pair] ?? body.result[alterPair];
+                    var alterPair = "X" + pair.Substring(0, pair.Length - 3) + "Z" + pair.Substring(pair.Length - 3);
+                    var pricePairs = body.result[pair] ?? body.result[alterPair];
                     if (Configuration.Operation.UseMarketPrice)
                     {
-                        var price = new Price(decimal.Parse(pairs.b.First.Value));
+                        var price = new Price(decimal.Parse(pricePairs.b.First.Value));
                         currentPriceId = (ulong)DateTime.Now.Ticks;
                         Prices[currentPriceId] = price;
                     }
                     else
                     {
-                        foreach (var pair in pairs)
+                        foreach (var pricePair in pricePairs)
                         {
-                            var price = new Price(pair);
+                            var price = new Price(pricePair);
                             currentPriceId = price.Id;
                             Prices[currentPriceId] = price;
                         }
@@ -160,17 +149,17 @@ namespace KBroker
             return LastPriceId == 0 ? null : Prices[LastPriceId];
         }
 
-        public void WaitForStartPrice(string pair, decimal startPrice)
+        public void WaitForStartPrice(decimal startPrice)
         {
             decimal price = 0;
-            var symbol = Display.GetCurrencySymbol(pair);
+            var symbol = Display.GetCurrencySymbol();
             while (startPrice > price)
             {
                 try
                 {
                     price = GetCurrentPrice().Close;
-                    Display.PrintWaitingForStartPrice(Pair, price, InitialPrice.Value, startPrice);
-                    Console.Title = $"Awaiting {Pair}...";
+                    Display.PrintWaitingForStartPrice(price, InitialPrice.Value, startPrice);
+                    Console.Title = $"Awaiting {Configuration.Pair}...";
                 }
                 catch (Exception ex)
                 {
@@ -282,7 +271,7 @@ namespace KBroker
         public bool PriceLostTooMuchGain(decimal currentPrice, decimal takeProfitPrice, bool useMarketPrice)
         {
             TimeSpan timeSinceMaxWasSet = MaxPrice.Created.HasValue ? MaxPrice.Created.Value - DateTime.Now : TimeSpan.MaxValue;
-            decimal seekToKeepAtLeastThisPercentageFromGains = 
+            decimal seekToKeepAtLeastThisPercentageFromGains =
                   timeSinceMaxWasSet.TotalMinutes < 3 ? (useMarketPrice ? 15 : 30)
                 : timeSinceMaxWasSet.TotalMinutes < 5 ? (useMarketPrice ? 30 : 40)
                 : timeSinceMaxWasSet.TotalMinutes < 8 ? 60

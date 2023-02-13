@@ -22,7 +22,6 @@ namespace KBroker
                 var lastPrice = broker.LastPriceId == 0 ? null : broker.Prices[broker.LastPriceId];
                 var price = broker.GetCurrentPrice();
                 Display.PrintProgress(
-                    broker.Pair,
                     StopLoss.TriggerTrailingPrice ?? StopLoss.NextTrailingPrice ?? StopLoss.Price.Value, 
                     StopLoss.Price.Value, 
                     price.Close, 
