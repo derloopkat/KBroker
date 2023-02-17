@@ -271,10 +271,10 @@ namespace KBroker
         public bool PriceLostTooMuchGain(decimal currentPrice, decimal takeProfitPrice, bool useMarketPrice)
         {
             TimeSpan timeSinceMaxWasSet = MaxPrice.Created.HasValue ? MaxPrice.Created.Value - DateTime.Now : TimeSpan.MaxValue;
-            decimal seekToKeepAtLeastThisPercentageFromGains =
-                  timeSinceMaxWasSet.TotalMinutes < 3 ? (useMarketPrice ? 15 : 30)
-                : timeSinceMaxWasSet.TotalMinutes < 5 ? (useMarketPrice ? 30 : 40)
-                : timeSinceMaxWasSet.TotalMinutes < 8 ? 60
+            decimal seekToKeepAtLeastThisPercentageFromGains = 
+                  timeSinceMaxWasSet.TotalMinutes < 3 ? (useMarketPrice ? 7  : 20)
+                : timeSinceMaxWasSet.TotalMinutes < 5 ? (useMarketPrice ? 15 : 40)
+                : timeSinceMaxWasSet.TotalMinutes < 8 ? (useMarketPrice ? 50 : 60)
                 : timeSinceMaxWasSet.TotalMinutes < 10 ? 70
                 : 75;
             var minimumAcceptableGains = (MaxPrice.Close - takeProfitPrice) * seekToKeepAtLeastThisPercentageFromGains / 100;

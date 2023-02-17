@@ -29,7 +29,7 @@ namespace KBroker
         public OrderType? OrderType { get; set; }
         public OrderSide? SideType { get;set; }
         public decimal? TriggerPrice { get; set; }
-        public decimal? NewStoplossPrice { get; set; }
+        public decimal? NewPrice { get; set; }
         public OrderTriggerBy? TriggerBy { get; set; }
         public List<decimal> TrailingLevels { get; set; }
 
@@ -46,6 +46,14 @@ namespace KBroker
             get
             {
                 return TrailingLevels.Count > 1 ? TrailingLevels[1] : null;
+            }
+        }
+
+        public bool HasId
+        {
+            get
+            {
+                return !String.IsNullOrEmpty(Id);
             }
         }
 

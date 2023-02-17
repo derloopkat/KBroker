@@ -100,36 +100,42 @@ namespace KBroker
 
         private static void SetupTakeProfitOrder(Operation operation, IConfiguration section)
         {
-            var id = section.GetSection("id");
+            var order = operation.TakeProfit;
             var volume = section.GetSection("volume");
+            var price = section.GetSection("price");
             var greedy = section.GetSection("greedy")?.Value ?? "false";
             var plainGreed = section.GetSection("plainGreed")?.Value ?? "false";
+            var edit = section.GetSection("edit");
 
-            if (id.Exists())
+            if (!price.Exists())
             {
-                operation.TakeProfit.Id = id.Value.Trim();
+                throw new Exception("Details: price is mandatory for your takeprofit order.");
+            }
+
+            order.OrderType = OrderType.Market;
+            order.SideType = OrderSide.Sell;
+            order.Price = decimal.Parse(price.Value);
+            order.BeGreedy = bool.Parse(greedy);
+            order.PlainGreed = bool.Parse(plainGreed);
+            order.Pair = Pair;
+
+            if (volume.Exists())
+            {
+                order.Volume = decimal.Parse(section.GetSection("volume").Value);
+            }
+            else if (operation.StopLoss.Volume.HasValue)
+            {
+                order.Volume = operation.StopLoss.Volume;
             }
             else
             {
-                operation.TakeProfit.OrderType = OrderType.Market;
-                operation.TakeProfit.SideType = OrderSide.Sell;
-                operation.TakeProfit.Price = decimal.Parse(section.GetSection("price").Value);
-                operation.TakeProfit.BeGreedy = bool.Parse(greedy);
-                operation.TakeProfit.PlainGreed = bool.Parse(plainGreed);
-                operation.TakeProfit.Pair = Configuration.Pair;
+                throw new Exception("Details: takeprofit volume is mandatory unless it's the same specified by stoploss in your operation file.");
+            }
 
-                if (volume.Exists())
-                {
-                    operation.TakeProfit.Volume = decimal.Parse(section.GetSection("volume").Value);
-                }
-                else if (operation.StopLoss.Volume.HasValue)
-                {
-                    operation.TakeProfit.Volume = operation.StopLoss.Volume;
-                }
-                else
-                {
-                    throw new Exception("Details: takeprofit volume is mandatory unless it's specified for stoploss, in which case the same is assumed.");
-                }
+            if (edit.Exists())
+            {
+                order.TriggerPrice = decimal.Parse(edit.GetSection("triggerPrice").Value);
+                order.NewPrice = decimal.Parse(edit.GetSection("newPrice").Value);
             }
         }
 
@@ -165,7 +171,7 @@ namespace KBroker
             if (edit.Exists())
             {
                 order.TriggerPrice = decimal.Parse(edit.GetSection("triggerPrice").Value);
-                order.NewStoplossPrice = decimal.Parse(edit.GetSection("newPrice").Value);
+                order.NewPrice = decimal.Parse(edit.GetSection("newPrice").Value);
             }
 
             if (triggerBy.Exists())

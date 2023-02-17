@@ -165,7 +165,7 @@ namespace KBroker
         {
             string json;
             order.IsEdit = true;
-            if (Orders.ContainsKey(order.Id))
+            if (order.HasId && Orders.ContainsKey(order.Id))
             {
                 var status = "ok";
                 var newOrderId = $"XXXXXX-XXXXX-{DateTime.Now.Ticks}";

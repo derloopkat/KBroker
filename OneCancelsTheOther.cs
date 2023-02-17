@@ -22,6 +22,21 @@ namespace KBroker
                 return false;
         }
 
+        private void EditOrderPrice(Order order, Broker broker)
+        {
+            order.Price = order.NewPrice;
+            if (order.HasId)
+            {
+                var response = broker.EditOrder(order);
+                Display.AddOrderResponse(order, response); 
+            }
+
+            if (!order.Error)
+            {
+                order.TriggerPrice = null;
+            }
+        }
+
         public override void Execute(Broker broker)
         {
             try
@@ -84,11 +99,13 @@ namespace KBroker
                 }
                 else if (StopLoss.TriggerPrice.HasValue && price.Close >= StopLoss.TriggerPrice)
                 {
-                    StopLoss.Price = StopLoss.NewStoplossPrice;
-                    response = broker.EditOrder(StopLoss);
-                    if (!StopLoss.Error) 
-                        StopLoss.TriggerPrice = null;
-                    Display.AddOrderResponse(StopLoss, response);
+                    EditOrderPrice(StopLoss, broker);
+                    Display.PrintSuccess($"Increased stoploss price to ${StopLoss.Price}.");
+                }
+                else if (TakeProfit.TriggerPrice.HasValue && price.Close <= TakeProfit.TriggerPrice)
+                {
+                    EditOrderPrice(TakeProfit, broker);
+                    Display.PrintSuccess($"Reduced takeprofit price to ${TakeProfit.Price}.");
                 }
             }
             catch(SystemStatusException ex)

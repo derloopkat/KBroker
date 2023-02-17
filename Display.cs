@@ -256,7 +256,7 @@ namespace KBroker
             if (stopLoss.Price.HasValue)
             {
                 var triggerBy = operation.UseMarketPrice ? "market" : "last";
-                var edit = stopLoss.TriggerPrice.HasValue ? $"change to {symbol}{stopLoss.NewStoplossPrice} when {triggerBy} price is {symbol}{stopLoss.TriggerPrice}" : "";
+                var edit = stopLoss.TriggerPrice.HasValue ? $"change to {symbol}{stopLoss.NewPrice} when {triggerBy} price is {symbol}{stopLoss.TriggerPrice}" : "";
                 Console.WriteLine($"Stop loss: {symbol}{stopLoss.Price} {edit}");
             }
 
