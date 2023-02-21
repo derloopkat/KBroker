@@ -1,25 +1,18 @@
 {
-  "timeout": 8000,
+  "timeout": 6000,
   "interval": 1,
-  "version": 1.0,
+  "version": 1.1,
+  "simulation": {
+    "currentPrice": 14,
+    "priceTrend": "MockedAscending"
+  },
   "operation": {
-    "type": "OneCancelsTheOther",
+    "type": "TrailingStopLoss",
     "pair": "FOOUSD",
-    "startPrice": 15,
-    "useMarketPrice": true,
     "stoploss": {
-      "id": "XXXXXX-XXXXX-123456",
-      "volume": 1,
-      "triggerBy": "index"
-    },
-    "takeprofit": {
-      "price": 16,
-      "volume": 1,
-      "greedy": true
-    },
-    "cancelOrders": [
-      "XXXXXX-XXXXX-000001",
-      "XXXXXX-XXXXX-000002"
-    ]
+      "price": 13.932,
+      "volume": 145.558235,
+      "trailing": [ 14, 14.110, 14.297, 14.397, 14.847 ]
+    }
   }
 }

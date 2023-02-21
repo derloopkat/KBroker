@@ -1,7 +1,11 @@
 {
   "timeout": 6000,
   "interval": 1,
-  "version": 1.0,
+  "version": 1.1,
+  "simulation": {
+    "currentPrice": 15.5,
+    "priceTrend": "MockedAscending"
+  },
   "operation": {
     "type": "TrailingStopLoss",
     "pair": "FOOUSD",

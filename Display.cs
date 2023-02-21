@@ -249,15 +249,15 @@ namespace KBroker
         public static void PrintHeader(Broker broker, Operation operation)
         {
             var symbol = GetCurrencySymbol();
+            var triggerBy = operation.UseMarketPrice ? "market" : "last";
             var stopLoss = operation.StopLoss;
             var takeProfit = operation.TakeProfit;
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"Pair: {Configuration.Pair}");
+            Console.WriteLine($"Pair:\t\t{Configuration.Pair}");
             if (stopLoss.Price.HasValue)
             {
-                var triggerBy = operation.UseMarketPrice ? "market" : "last";
-                var edit = stopLoss.TriggerPrice.HasValue ? $"change to {symbol}{stopLoss.NewPrice} when {triggerBy} price is {symbol}{stopLoss.TriggerPrice}" : "";
-                Console.WriteLine($"Stop loss: {symbol}{stopLoss.Price} {edit}");
+                var edit = stopLoss.TriggerPrice.HasValue ? $"Change to {symbol}{stopLoss.NewPrice} When {triggerBy} price is {symbol}{stopLoss.TriggerPrice}" : "";
+                Console.WriteLine($"Stop loss:\t{symbol}{stopLoss.Price} {edit}");
             }
 
             if (operation is OneCancelsTheOther)
@@ -265,14 +265,15 @@ namespace KBroker
                 if (takeProfit != null)
                 {
                     var greed = takeProfit.BeGreedy | takeProfit.PlainGreed ? "(greedy)" : "";
-                    Console.WriteLine($"Take profit: {symbol}{takeProfit.Price} {greed}");
-                    Console.WriteLine($"Volume: {takeProfit.Volume}");
+                    var edit = takeProfit.TriggerPrice.HasValue ? $"Change to {symbol}{takeProfit.NewPrice} When {triggerBy} price is {symbol}{takeProfit.TriggerPrice}" : "\b";
+                    Console.WriteLine($"Take profit:\t{symbol}{takeProfit.Price} {edit} {greed}");
+                    Console.WriteLine($"Volume:\t\t{takeProfit.Volume}");
                 }
             }
             else if(operation is TrailingStopLoss)
             {
-                Console.WriteLine($"Stop loss trailing: {String.Join(", ", stopLoss.TrailingLevels)}");
-                Console.WriteLine($"Volume: {stopLoss.Volume}");
+                Console.WriteLine($"Trailing:\t{symbol}{String.Join($", {symbol}", stopLoss.TrailingLevels)}");
+                Console.WriteLine($"Volume:\t\t{stopLoss.Volume}");
             }
             if (broker is Simulator)
             {

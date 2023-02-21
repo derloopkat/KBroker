@@ -1,7 +1,7 @@
 {
   "timeout": 8000,
   "interval": 1,
-  "version": 1.0,
+  "version": 1.1,
   "simulation": {
     "currentPrice": 15,
     "priceTrend": "MockedAscending"
@@ -21,7 +21,11 @@
     "takeprofit": {
       "price": 16,
       "volume": 1,
-      "greedy": true
+      "greedy": true,
+      "edit": {
+        "triggerPrice": 14.5,
+        "newPrice": 15.5
+      }
     }
   }
 }
