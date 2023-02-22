@@ -100,12 +100,14 @@ namespace KBroker
                 else if (StopLoss.TriggerPrice.HasValue && price.Close >= StopLoss.TriggerPrice)
                 {
                     EditOrderPrice(StopLoss, broker);
-                    Display.PrintSuccess($"Increased stoploss price to ${StopLoss.Price}.");
+                    if(!StopLoss.Error)
+                        Display.PrintSuccess($"Increased stoploss price to ${StopLoss.Price}.");
                 }
                 else if (TakeProfit.TriggerPrice.HasValue && price.Close <= TakeProfit.TriggerPrice)
                 {
                     EditOrderPrice(TakeProfit, broker);
-                    Display.PrintSuccess($"Reduced takeprofit price to ${TakeProfit.Price}.");
+                    if(!TakeProfit.Error)
+                        Display.PrintSuccess($"Reduced takeprofit price to ${TakeProfit.Price}.");
                 }
             }
             catch(SystemStatusException ex)

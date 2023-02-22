@@ -51,13 +51,15 @@ namespace KBroker
                 }
 
                 broker.Trade(operation);
-
-                Console.ReadLine();
             }
             catch (Exception ex)
             {
                 Display.Print(ex.Message, ConsoleColor.Red);
                 Logger.AddEntry($"{ex.Message}\r\n{ex.StackTrace}\r\n{ex.InnerException?.Message ?? string.Empty}");
+            }
+            finally
+            {
+                Console.ReadLine();
             }
         }
     }

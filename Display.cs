@@ -74,7 +74,7 @@ namespace KBroker
                     PrintError($"ERROR. {response["error"][i].Value}", bell: false);
                 }
 
-                if (errorCount == 0)
+                if (errorCount == 0 && responseText != "{}")
                     PrintCode(responseText);
                 else if(errorCount > 1 || (!(responseText ?? "").Contains("Too many requests")))
                     Console.Write("\a");
@@ -211,7 +211,8 @@ namespace KBroker
             if (order.Error)
             {
                 Print(response);
-                PrintError($"Unable to create new {orderType} order!");
+                if(!string.IsNullOrEmpty(orderType))
+                    PrintError($"Unable to create new {orderType} order!");
             }
             else
             {
