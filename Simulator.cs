@@ -10,13 +10,12 @@ namespace KBroker
     public class Simulator : Broker
     {
         public static Dictionary<string,Order> Orders = new Dictionary<string, Order>();
-        public static SimulatedPriceTrend PriceTrend { get; set; }
         private static Random RandomValue = new Random();
-        private static decimal CurrentPrice { get; set; }
+        public static decimal CurrentPrice { get; set; }
 
         public override int PercentageDone { get; set; }
 
-        public Simulator(decimal currentPrice, SimulatedPriceTrend priceTrend = SimulatedPriceTrend.UseRealPrice, decimal? stopLossPrice = null)
+        public Simulator(decimal? stopLossPrice = null)
         {
             var ids = new[] { "XXXXXX-XXXXX-123456", "XXXXXX-XXXXX-000001", "XXXXXX-XXXXX-000002" };
             if (stopLossPrice.HasValue)
@@ -43,27 +42,39 @@ namespace KBroker
                 Volume = 0.5m,
                 Price = stopLossPrice * 1.2m,
             });
-            CurrentPrice = currentPrice;
             MaxPrice = new Price(0);
-            PriceTrend = priceTrend;
         }
 
         public override Price GetCurrentPrice()
         {
             if (Prices != null)
             {
+                var simulation = (Operation.SimulationConfiguration)Configuration.Operation.Simulation;
+                var milestone = simulation.Milestones.First();
                 var step = Math.Round(CurrentPrice * 0.005M, 4, MidpointRounding.AwayFromZero);
-                var choice = RandomValue.Next(1, 4);
-                step = choice == 2 ? step = -step / 2
-                       : choice == 1 ? 0
-                       : step;
 
-                if (PriceTrend == SimulatedPriceTrend.MockedAscending)
+                if (simulation.Trend == SimulatedPriceTrend.Ascending)
+                {
                     CurrentPrice += step;
-                else if (PriceTrend == SimulatedPriceTrend.MockedDescending)
+                }
+
+                else if (simulation.Trend == SimulatedPriceTrend.Descending)
+                {
                     CurrentPrice -= step;
-                else if (PriceTrend == SimulatedPriceTrend.UseRealPrice)
-                    CurrentPrice = base.GetCurrentPrice().Close;
+
+                }
+
+                var priceReachedMilestone = (simulation.Trend == SimulatedPriceTrend.Ascending && CurrentPrice >= milestone)
+                    || (simulation.Trend == SimulatedPriceTrend.Descending && CurrentPrice <= milestone);
+                if (priceReachedMilestone && simulation.Milestones.Count > 1)
+                {
+                    simulation.Milestones.Remove(milestone);
+
+                    var nextMilestone = simulation.Milestones.First();
+                    simulation.Trend = milestone < nextMilestone ? SimulatedPriceTrend.Ascending
+                        : milestone > nextMilestone ? SimulatedPriceTrend.Descending
+                        : (SimulatedPriceTrend)((int)simulation.Trend * -1);
+                }
 
                 LastPriceId = (ulong)Prices.Values.Count;
                 Prices[LastPriceId] = new Price(CurrentPrice);

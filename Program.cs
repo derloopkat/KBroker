@@ -22,8 +22,6 @@ namespace KBroker
                 {
                     broker = new Simulator
                     (
-                        currentPrice: operation.Simulation?.CurrentPrice ?? 0,
-                        priceTrend: operation.Simulation?.PriceTrend ?? 0,
                         stopLossPrice: operation.StopLoss.Price
                     );
                 }

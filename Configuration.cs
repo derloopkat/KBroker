@@ -70,13 +70,23 @@ namespace KBroker
 
                 if (simulationSection.Exists())
                 {
-                    var currentPrice = simulationSection.GetSection("currentPrice");
-                    var priceTrend = simulationSection.GetSection("priceTrend");
+                    var milestones = simulationSection
+                        .GetSection("milestones")
+                        .GetChildren()
+                        .Select(t => decimal.Parse(t.Value))
+                        .ToList();
+                    if (milestones.Count < 2)
+                    {
+                        throw new Exception("Simulation milestones must contain at least two prices.");
+                    }
+
                     Operation.Simulation = new Operation.SimulationConfiguration
                     {
-                        CurrentPrice = decimal.Parse(currentPrice.Value),
-                        PriceTrend = (SimulatedPriceTrend)Enum.Parse(typeof(SimulatedPriceTrend), priceTrend.Value)
+                        Milestones = milestones,
+                        Trend = milestones[0] < milestones[1] ? SimulatedPriceTrend.Ascending
+                            : SimulatedPriceTrend.Descending
                     };
+                    Simulator.CurrentPrice = milestones.First();
                 }
 
                 Operation.UseMarketPrice = bool.Parse(useMarketPrice);

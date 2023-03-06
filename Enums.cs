@@ -26,9 +26,8 @@
 
     public enum SimulatedPriceTrend
     {
-        UseRealPrice,
-        MockedAscending,
-        MockedDescending
+        Descending = -1,
+        Ascending = 1
     }
 
     public static class EnumExtensions
