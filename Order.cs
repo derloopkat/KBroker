@@ -27,9 +27,8 @@ namespace KBroker
         public decimal? Volume { get; set; }
         public decimal? Cost { get; set; }
         public OrderType? OrderType { get; set; }
-        public OrderSide? SideType { get;set; }
-        public decimal? TriggerPrice { get; set; }
-        public decimal? NewPrice { get; set; }
+        public OrderSide? SideType { get; set; }
+        public Trigger Trigger { get; set; }
         public OrderTriggerBy? TriggerBy { get; set; }
         public List<decimal> TrailingLevels { get; set; }
 
@@ -65,6 +64,7 @@ namespace KBroker
         public Order()
         {
             TrailingLevels = new List<decimal>();
+            Trigger = new Trigger();
         }
 
         public Dictionary<string,string> PostData

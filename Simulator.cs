@@ -17,7 +17,7 @@ namespace KBroker
 
         public Simulator(decimal? stopLossPrice = null)
         {
-            var ids = new[] { "XXXXXX-XXXXX-123456", "XXXXXX-XXXXX-000001", "XXXXXX-XXXXX-000002" };
+            var ids = new[] { "XXXXXX-XXXXX-123456", "XXXXXX-XXXXX-000001", "XXXXXX-XXXXX-000002", "XXXXXX-XXXXX-00014" };
             if (stopLossPrice.HasValue)
             {
                 Orders.Add(ids.First(), new Order(ids.First())
@@ -41,6 +41,13 @@ namespace KBroker
                 SideType = OrderSide.Sell,
                 Volume = 0.5m,
                 Price = stopLossPrice * 1.2m,
+            });
+            Orders.Add(ids[3], new Order(ids[3])
+            {
+                OrderType = OrderType.StopLoss,
+                SideType = OrderSide.Sell,
+                Price = 14,
+                Volume = 1m
             });
             MaxPrice = new Price(0);
         }
@@ -143,7 +150,7 @@ namespace KBroker
                 order.IsClosed = true;
                 order.IsCompleted = true;
             }
-            else if(order.OrderType == OrderType.StopLoss && order.SideType == OrderSide.Sell && order.IsPlaced && currentPrice.Close <= order.Price) 
+            else if(order.SideType == OrderSide.Sell && order.IsPlaced && currentPrice.Close <= order.Price) 
             {
                 /* TODO: to make it more realistic check datetime and history of prices before marking as sold. It could be that market price reached limit and went up. */
                 order.IsClosed = true;

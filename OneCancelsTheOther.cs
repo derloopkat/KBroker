@@ -17,14 +17,14 @@ namespace KBroker
             if (TakeProfit.PlainGreed)
                 return lastPrice.HasValue && currentPrice >= lastPrice && !FailedToSellGreedyTakeprofit;
             else if (TakeProfit.BeGreedy)
-                return !broker.PriceLostTooMuchGain(currentPrice, TakeProfit.Price.Value, UseMarketPrice);
+                return !broker.PriceLostTooMuchMargin(currentPrice, TakeProfit.Price.Value, UseMarketPrice);
             else
                 return false;
         }
 
         private void EditOrderPrice(Order order, Broker broker)
         {
-            order.Price = order.NewPrice;
+            order.Price = order.Trigger.NewPrice;
             if (order.HasId)
             {
                 var response = broker.EditOrder(order);
@@ -33,7 +33,7 @@ namespace KBroker
 
             if (!order.Error)
             {
-                order.TriggerPrice = null;
+                order.Trigger.Price = null;
             }
         }
 
@@ -97,13 +97,13 @@ namespace KBroker
                         TasksCompleted = true;
                     }
                 }
-                else if (StopLoss.TriggerPrice.HasValue && price.Close >= StopLoss.TriggerPrice)
+                else if (StopLoss.Trigger.Price.HasValue && price.Close >= StopLoss.Trigger.Price)
                 {
                     EditOrderPrice(StopLoss, broker);
                     if(!StopLoss.Error)
                         Display.PrintSuccess($"Increased stoploss price to ${StopLoss.Price}.");
                 }
-                else if (TakeProfit.TriggerPrice.HasValue && price.Close <= TakeProfit.TriggerPrice)
+                else if (TakeProfit.Trigger.Price.HasValue && price.Close <= TakeProfit.Trigger.Price)
                 {
                     EditOrderPrice(TakeProfit, broker);
                     if(!TakeProfit.Error)

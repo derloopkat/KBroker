@@ -257,7 +257,7 @@ namespace KBroker
             Console.WriteLine($"Pair:\t\t{Configuration.Pair}");
             if (stopLoss.Price.HasValue)
             {
-                var edit = stopLoss.TriggerPrice.HasValue ? $"Change to {symbol}{stopLoss.NewPrice} When {triggerBy} price is {symbol}{stopLoss.TriggerPrice}" : "";
+                var edit = stopLoss.Trigger.Price.HasValue ? $"Change to {symbol}{stopLoss.Trigger.NewPrice} When {triggerBy} price is {symbol}{stopLoss.Trigger.Price}" : "";
                 Console.WriteLine($"Stop loss:\t{symbol}{stopLoss.Price} {edit}");
             }
 
@@ -266,7 +266,7 @@ namespace KBroker
                 if (takeProfit != null)
                 {
                     var greed = takeProfit.BeGreedy | takeProfit.PlainGreed ? "(greedy)" : "";
-                    var edit = takeProfit.TriggerPrice.HasValue ? $"Change to {symbol}{takeProfit.NewPrice} When {triggerBy} price is {symbol}{takeProfit.TriggerPrice}" : "\b";
+                    var edit = takeProfit.Trigger.Price.HasValue ? $"Change to {symbol}{takeProfit.Trigger.NewPrice} When {triggerBy} price is {symbol}{takeProfit.Trigger.Price}" : "\b";
                     Console.WriteLine($"Take profit:\t{symbol}{takeProfit.Price} {edit} {greed}");
                     Console.WriteLine($"Volume:\t\t{takeProfit.Volume}");
                 }

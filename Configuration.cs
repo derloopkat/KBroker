@@ -115,7 +115,7 @@ namespace KBroker
             var price = section.GetSection("price");
             var greedy = section.GetSection("greedy")?.Value ?? "false";
             var plainGreed = section.GetSection("plainGreed")?.Value ?? "false";
-            var edit = section.GetSection("edit");
+            var trigger = section.GetSection("trigger");
 
             if (!price.Exists())
             {
@@ -142,10 +142,10 @@ namespace KBroker
                 throw new Exception("Details: takeprofit volume is mandatory unless it's the same specified by stoploss in your operation file.");
             }
 
-            if (edit.Exists())
+            if (trigger.Exists())
             {
-                order.TriggerPrice = decimal.Parse(edit.GetSection("triggerPrice").Value);
-                order.NewPrice = decimal.Parse(edit.GetSection("newPrice").Value);
+                order.Trigger.Price = decimal.Parse(trigger.GetSection("price").Value);
+                order.Trigger.NewPrice = decimal.Parse(trigger.GetSection("newPrice").Value);
             }
         }
 
@@ -153,7 +153,7 @@ namespace KBroker
         {
             var order = operation.StopLoss;
             var id = section.GetSection("id");
-            var edit = section.GetSection("edit");
+            var trigger = section.GetSection("trigger");
             var triggerBy = section.GetSection("triggerBy");
             var price = section.GetSection("price");
             var trailingLevels = section.GetSection("trailing");
@@ -178,10 +178,10 @@ namespace KBroker
                 order.Volume = decimal.Parse(volume.Value);
             }
 
-            if (edit.Exists())
+            if (trigger.Exists())
             {
-                order.TriggerPrice = decimal.Parse(edit.GetSection("triggerPrice").Value);
-                order.NewPrice = decimal.Parse(edit.GetSection("newPrice").Value);
+                order.Trigger.Price = decimal.Parse(trigger.GetSection("price").Value);
+                order.Trigger.NewPrice = decimal.Parse(trigger.GetSection("newPrice").Value);
             }
 
             if (triggerBy.Exists())
@@ -192,6 +192,14 @@ namespace KBroker
             if (trailingLevels.Exists())
             {
                 order.TrailingLevels = trailingLevels.GetChildren().Select(t => decimal.Parse(t.Value)).ToList();
+                if (!((TrailingStopLoss)operation).LevelsAreConsistent())
+                {
+                    throw new Exception("Details: trailing levels should be sorted ascending.");
+                }
+            }
+            else if(operation is TrailingStopLoss)
+            {
+                throw new Exception("Details: trailing levels are mandatory for trailing stoploss operations.");
             }
         }
     }

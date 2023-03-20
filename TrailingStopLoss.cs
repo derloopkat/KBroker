@@ -70,20 +70,13 @@ namespace KBroker
                 Display.PrintError(ex.Message);
             }
         }
-
-        //private dynamic AddNewLevelStopLossOrder(Broker broker, decimal? margin)
-        //{
-        //    StopLoss = new Order()
-        //    {
-        //        OrderType = OrderType.StopLoss,
-        //        SideType = OrderSide.Sell,
-        //        Price = StopLoss.Price + margin,
-        //        Volume = StopLoss.Volume,
-        //        Pair = StopLoss.Pair
-        //    };
-        //    var response = broker.AddOrder(StopLoss);
-        //    Display.AddOrderResponse(StopLoss, response);
-        //    return response;
-        //}
+        
+        public bool LevelsAreConsistent()
+        {
+            var sorted = StopLoss.TrailingLevels
+                .OrderBy(p => p)
+                .Select((price, index) => new { price, index });
+            return !sorted.Any(level => StopLoss.TrailingLevels[level.index] != level.price);
+        }
     }
 }

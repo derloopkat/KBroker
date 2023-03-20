@@ -268,16 +268,16 @@ namespace KBroker
             return response;
         }
 
-        public bool PriceLostTooMuchGain(decimal currentPrice, decimal takeProfitPrice, bool useMarketPrice)
+        public bool PriceLostTooMuchMargin(decimal currentPrice, decimal takeProfitPrice, bool useMarketPrice)
         {
             TimeSpan timeSinceMaxWasSet = MaxPrice.Created.HasValue ? MaxPrice.Created.Value - DateTime.Now : TimeSpan.MaxValue;
-            decimal seekToKeepAtLeastThisPercentageFromGains = 
+            decimal seekToKeepAtLeastThisPercentageFromMargin = 
                   timeSinceMaxWasSet.TotalMinutes < 3 ? (useMarketPrice ? 7  : 20)
                 : timeSinceMaxWasSet.TotalMinutes < 5 ? (useMarketPrice ? 15 : 40)
                 : timeSinceMaxWasSet.TotalMinutes < 8 ? (useMarketPrice ? 50 : 60)
                 : timeSinceMaxWasSet.TotalMinutes < 10 ? 70
                 : 75;
-            var minimumAcceptableGains = (MaxPrice.Close - takeProfitPrice) * seekToKeepAtLeastThisPercentageFromGains / 100;
+            var minimumAcceptableGains = (MaxPrice.Close - takeProfitPrice) * seekToKeepAtLeastThisPercentageFromMargin / 100;
             var minimumAcceptablePrice = takeProfitPrice + minimumAcceptableGains;
             return currentPrice < minimumAcceptablePrice;
         }
