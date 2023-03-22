@@ -7,6 +7,7 @@ namespace KBroker
 {
     public class Configuration
     {
+        public const float LatestConfigurationVersionSupported = 1.3f;
         public const string OrdersFileName = "operation.json";
         public static int Timeout;
         public static float IntervalSeconds;
@@ -45,6 +46,10 @@ namespace KBroker
                     SetupStopLossOrder(operation, operationSection.GetSection("stoploss"));
                     SetupTakeProfitOrder(operation, operationSection.GetSection("takeprofit"));
                     Operation = operation;
+                    if(operation.StopLoss.Price.HasValue && operation.TakeProfit.Price <= operation.StopLoss.Price + (operation.StopLoss.Price * 0.006m))
+                    {
+                        throw new Exception("Details: make sure takeprofit and stoploss prices are correct and the values are not too close.");
+                    }
                 }
                 else if (operationType == "TrailingStopLoss")
                 {
@@ -61,6 +66,10 @@ namespace KBroker
                 if (version.Exists())
                 {
                     Operation.Version = float.Parse(root.GetSection("version").Value);
+                    if(Operation.Version < LatestConfigurationVersionSupported)
+                    {
+                        throw new Exception($"Your {OrdersFileName} file is no longer supported by this application. The latest supported version is {LatestConfigurationVersionSupported}.");
+                    }
                 }
 
                 if (cancelOrders.Exists())
@@ -77,7 +86,7 @@ namespace KBroker
                         .ToList();
                     if (milestones.Count < 2)
                     {
-                        throw new Exception("Simulation milestones must contain at least two prices.");
+                        throw new Exception("Simulation milestones must exist and contain at least two prices.");
                     }
 
                     Operation.Simulation = new Operation.SimulationConfiguration
@@ -194,7 +203,7 @@ namespace KBroker
                 order.TrailingLevels = trailingLevels.GetChildren().Select(t => decimal.Parse(t.Value)).ToList();
                 if (!((TrailingStopLoss)operation).LevelsAreConsistent())
                 {
-                    throw new Exception("Details: trailing levels should be sorted ascending.");
+                    throw new Exception("Details: trailing levels must include two or more prices, sorted ascending.");
                 }
             }
             else if(operation is TrailingStopLoss)

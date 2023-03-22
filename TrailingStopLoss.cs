@@ -76,7 +76,8 @@ namespace KBroker
             var sorted = StopLoss.TrailingLevels
                 .OrderBy(p => p)
                 .Select((price, index) => new { price, index });
-            return !sorted.Any(level => StopLoss.TrailingLevels[level.index] != level.price);
+            var levelsSortedAscending = !sorted.Any(level => StopLoss.TrailingLevels[level.index] != level.price);
+            return StopLoss.TrailingLevels.Count >= 2 && levelsSortedAscending;
         }
     }
 }

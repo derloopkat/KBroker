@@ -254,8 +254,6 @@ namespace KBroker
             order.IsOkay = status == "ok";
             order.IsOpen = status == "open";
             order.IsUnknown = response["error"].ToString().Contains("EOrder:Unknown order");
-            //order.TriggerBy = details["trigger"] == "index" ? OrderTriggerBy.Index : OrderTriggerBy.Last;
-            //order.Cost = response["result"]?[order.Id]?["cost"];
             if (order.IsClosed)
             {
                 order.IsCompleted = response["result"][order.Id]["vol"] == response["result"][order.Id]["vol_exec"];

@@ -3,8 +3,7 @@
   "interval": 1,
   "version": 1.3,
   "simulation": {
-    "currentPrice": 15,
-    "priceTrend": "MockedAscending"
+    "milestones": [ 15, 16.5, 14 ]
   },
   "operation": {
     "type": "OneCancelsTheOther",

@@ -17,7 +17,7 @@ namespace KBroker
 
         public Simulator(decimal? stopLossPrice = null)
         {
-            var ids = new[] { "XXXXXX-XXXXX-123456", "XXXXXX-XXXXX-000001", "XXXXXX-XXXXX-000002", "XXXXXX-XXXXX-00014" };
+            var ids = new[] { "XXXXXX-XXXXX-123456", "XXXXXX-XXXXX-000001", "XXXXXX-XXXXX-000002", "XXXXXX-PRICE-00014" };
             if (stopLossPrice.HasValue)
             {
                 Orders.Add(ids.First(), new Order(ids.First())
@@ -25,6 +25,7 @@ namespace KBroker
                     OrderType = OrderType.StopLoss,
                     SideType = OrderSide.Sell,
                     Volume = 1,
+                    IsOpen = true,
                     Price = stopLossPrice
                 });
             }
@@ -33,19 +34,22 @@ namespace KBroker
                 OrderType = OrderType.Limit,
                 SideType = OrderSide.Sell,
                 Price = stopLossPrice * 1.1m,
-                Volume = 0.5m
+                Volume = 0.5m,
+                IsOpen = true
             });
             Orders.Add(ids[2], new Order(ids[2])
             {
                 OrderType = OrderType.Limit,
                 SideType = OrderSide.Sell,
                 Volume = 0.5m,
+                IsOpen = true,
                 Price = stopLossPrice * 1.2m,
             });
             Orders.Add(ids[3], new Order(ids[3])
             {
                 OrderType = OrderType.StopLoss,
                 SideType = OrderSide.Sell,
+                IsOpen = true,
                 Price = 14,
                 Volume = 1m
             });
@@ -158,13 +162,14 @@ namespace KBroker
             }
 
             if (Orders.ContainsKey(order.Id))
-            {                
+            {
+                var orderPrice = order.OrderType == OrderType.Market ? currentPrice.Close : order.Price.Value;
                 json =  $"{{\"error\": [ ],\"result\": {{\"{order.Id}\": {{\"status\": \"{(order.IsClosed ? "closed" : "open")}\"," +
                         $"\"opentm\": {DateTimeOffset.UtcNow.ToUnixTimeSeconds()},\"descr\": {{\"pair\": \"{Configuration.Pair}\",\"type\": \"{order.SideType.GetDescription()}\"," +
-                        $"\"ordertype\": \"{order.OrderType.GetDescription()}\",\"price\": \"{order.Price}\",\"order\": \"{order.SideType.GetDescription()} " +
-                        $"{order.Volume} {Configuration.Pair} @ {order.OrderType.GetDescription()} {order.Price}\",\"close\": \"\"}},\"vol\": \"{order.Volume}\", \"vol_exec\": " +
-                        $"\"{order.Volume}\",\"cost\": \"{order.Price * order.Volume}\",\"fee\": \"XX.X\",\"price\": \"{order.Price}\",\"stopprice\": \"0.00000\"," +
-                        $"\"limitprice\": \"{order.Price}\",\"trigger\": \"index\"}}}}}}";
+                        $"\"ordertype\": \"{order.OrderType.GetDescription()}\",\"price\": \"{orderPrice}\",\"order\": \"{order.SideType.GetDescription()} " +
+                        $"{order.Volume} {Configuration.Pair} @ {order.OrderType.GetDescription()} {orderPrice}\",\"close\": \"\"}},\"vol\": \"{order.Volume}\", \"vol_exec\": " +
+                        $"\"{order.Volume}\",\"cost\": \"{orderPrice * order.Volume}\",\"fee\": \"XX.X\",\"price\": \"{orderPrice}\",\"stopprice\": \"0.00000\"," +
+                        $"\"limitprice\": \"{orderPrice}\",\"trigger\": \"index\"}}}}}}";
             }
             else
             {

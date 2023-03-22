@@ -10,7 +10,7 @@ var broker = new Simulator
 {
   "timeout": 8000,
   "interval": 1,
-  "version": 1.0,
+  "version": 1.3,
   "operation": {
     "type": "OneCancelsTheOther",
     "pair": "FOOUSD",
@@ -18,8 +18,8 @@ var broker = new Simulator
     "stoploss": {
       "price": 14,
       "volume": 1,
-      "edit": {
-        "triggerPrice": 15.5,
+      "trigger": {
+        "price": 15.5,
         "newPrice": 15
       }
     },
@@ -43,7 +43,7 @@ var broker = new Simulator
 {
   "timeout": 8000,
   "interval": 1,
-  "version": 1.0,
+  "version": 1.3,
   "operation": {
     "type": "OneCancelsTheOther",
     "pair": "FOOUSD",
@@ -76,7 +76,7 @@ var broker = new Simulator
 {
   "timeout": 8000,
   "interval": 4,
-  "version": 1.0,
+  "version": 1.3,
   "operation": {
     "type": "OneCancelsTheOther",
     "pair": "LRCUSD",

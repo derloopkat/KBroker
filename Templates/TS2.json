@@ -1,19 +1,17 @@
 {
   "timeout": 6000,
   "interval": 1,
-  "version": 1.1,
+  "version": 1.3,
   "simulation": {
-    "currentPrice": 14,
-    "priceTrend": "MockedAscending"
+    "milestones": [ 14, 15.6, 12 ]
   },
   "operation": {
     "type": "TrailingStopLoss",
     "pair": "FOOUSD",
-    "startPrice": 14,
     "stoploss": {
       "price": 13.932,
-      "volume": 145.558235,
-      "trailing": [ 14, 14.110, 14.297, 14.397, 14.847 ]
+      "volume": 10,
+      "trailing": [ 14, 14.39, 14.84, 16 ]
     }
   }
 }
