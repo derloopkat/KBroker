@@ -15,6 +15,7 @@ namespace KBroker
         public Order TakeProfit { get; set; }
         public Order StopLoss { get; set; }
         public decimal? StartPrice { get; set; }
+        public decimal? StartVolume { get; set; }
         public float? Version { get; set; }
         public string[] CancelOrders { get; set; }
         public SimulationConfiguration? Simulation { get; set; } 

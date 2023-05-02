@@ -11,8 +11,8 @@ namespace KBroker
     {
         public ConfigurationException(string message) : base(
             $"Error reading {Configuration.OrdersFileName} file. "
-            + "Make sure syntax is correct and numbers don't include comma as thousands separator."
-            + Environment.NewLine + message )
+            + "Operation file must be syntactically correct and numbers should not include comma as thousands separator."
+            + $"{Environment.NewLine}{message}")
         {
    
         }

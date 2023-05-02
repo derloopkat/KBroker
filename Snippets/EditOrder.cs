@@ -1,7 +1,7 @@
 ﻿using KBroker;
 using System.Threading;
 
-Configuration.LoadKeys();
+Configuration.LoadSecretKeys();
 var operation = Configuration.LoadOrders();
 var broker = new Simulator(87, SimulatedPriceTrend.MockedAscending);
 var intervalMiliseconds = 10000;

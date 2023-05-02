@@ -24,17 +24,17 @@ namespace KBroker
                 var root = builder.Build();
                 var simulationSection = root.GetSection("simulation");
                 var operationSection = root.GetSection("operation");
+                var rootStartPrice = root.GetSection("startPrice");
                 var pair = operationSection.GetSection("pair");
                 var operationType = operationSection.GetSection("type").Value;
                 var startPrice = operationSection.GetSection("startPrice");
+                var startVolume = operationSection.GetSection("startVolume");
                 var useMarketPrice = operationSection.GetSection("useMarketPrice")?.Value ?? "false";
                 var cancelOrders = operationSection.GetSection("cancelOrders");
                 var version = root.GetSection("version");
 
-                if (!pair.Exists())
-                {
-                    throw new Exception("Details: pair is missing. Please specify pair e.g. \"BTCUSD\".");
-                }
+                if (!pair.Exists()) throw new Exception("Details: pair is missing. Please specify pair e.g. \"BTCUSD\".");
+                if (rootStartPrice.Exists()) throw new Exception("Start price was declared at the wrong level.");
 
                 Timeout = int.Parse(root.GetSection("timeout").Value);
                 IntervalSeconds = float.Parse(root.GetSection("interval").Value);
@@ -58,24 +58,21 @@ namespace KBroker
                     Operation = operation;
                 }
 
-                if (startPrice.Exists())
+                Operation.StartPrice ??= startPrice.Exists() ? decimal.Parse(startPrice.Value) : null;
+                Operation.StartVolume ??= startVolume.Exists() ? decimal.Parse(startVolume.Value) : null;
+                Operation.Version ??= version.Exists() ? float.Parse(version.Value) : null;
+
+                if(Operation.Version < LatestConfigurationVersionSupported)
                 {
-                    Operation.StartPrice = decimal.Parse(startPrice.Value);
+                    throw new Exception($"Your {OrdersFileName} file is no longer supported by this application. The latest supported version is {LatestConfigurationVersionSupported}.");
                 }
 
-                if (version.Exists())
+                if(Operation.StartVolume < Operation.StopLoss.Volume || Operation.StartVolume < Operation.TakeProfit?.Volume)
                 {
-                    Operation.Version = float.Parse(root.GetSection("version").Value);
-                    if(Operation.Version < LatestConfigurationVersionSupported)
-                    {
-                        throw new Exception($"Your {OrdersFileName} file is no longer supported by this application. The latest supported version is {LatestConfigurationVersionSupported}.");
-                    }
+                    throw new Exception($"You can't sell more crypto than the amount available in your balance. Please check start volume, takeprofit and stoploss orders.");
                 }
 
-                if (cancelOrders.Exists())
-                {
-                    Operation.CancelOrders = cancelOrders.GetChildren().Select(o => o.Value).ToArray();
-                }
+                if (cancelOrders.Exists()) Operation.CancelOrders = cancelOrders.GetChildren().Select(o => o.Value).ToArray();
 
                 if (simulationSection.Exists())
                 {
@@ -174,13 +171,12 @@ namespace KBroker
                 order.Id = id.Value.Trim();
                 order.IsPlaced = true;
             }
+            else if (!volume.Exists() || !price.Exists())
+            {
+                throw new Exception("Details: price and volume are mandatory for creating a new order.");
+            }
             else
             {
-                if(!volume.Exists() || !price.Exists())
-                {
-                    throw new Exception("Details: price and volume are mandatory for creating a new order.");
-                }
-
                 order.OrderType = OrderType.StopLoss;
                 order.SideType = OrderSide.Sell;
                 order.Price = decimal.Parse(price.Value);
