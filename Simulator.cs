@@ -53,7 +53,34 @@ namespace KBroker
                 Price = 14,
                 Volume = 1m
             });
+
+            var buyOrder = new Order("XXXXXX-XXBUY-000013")
+            {
+                OrderType = OrderType.Limit,
+                SideType = OrderSide.Buy,
+                IsOpen = true,
+                Price = 13,
+                Volume = 5m
+            };
+            Orders.Add(buyOrder.Id, buyOrder);
             MaxPrice = new Price(0);
+        }
+
+        public override dynamic GetAccountBalances()
+        {
+            const string buyOrderId = "XXXXXX-XXBUY-000013";
+            var buyOrder = Orders.ContainsKey(buyOrderId) ? Orders[buyOrderId] : null;
+            var marketPrice = GetCurrentPrice();
+            var balance = buyOrder?.Price >= marketPrice.Close ? buyOrder?.Volume : 0;
+            var json = $"{{\"error\":[],\"result\":{{\"FOO\":\"{balance}\"}}}}";
+            var response = JsonConvert.DeserializeObject<dynamic>(json);
+
+            if (balance > 0)
+            {
+                buyOrder.IsCompleted = true;
+                Orders.Remove(buyOrderId);
+            }
+            return response;
         }
 
         public override Price GetCurrentPrice()

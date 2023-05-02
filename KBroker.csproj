@@ -11,8 +11,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Snippets\ClosedOrders.cs" />
     <Compile Remove="Snippets\CreateOrder.cs" />
     <Compile Remove="Snippets\EditOrder.cs" />
+    <Compile Remove="Snippets\MyModule1.cs" />
     <Compile Remove="Snippets\SimulatorSamples.cs" />
     <Compile Remove="Templates\_SimulatorSamples.cs" />
   </ItemGroup>
@@ -22,9 +24,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Snippets\CreateOrder.cs" />
-    <Content Include="Snippets\EditOrder.cs" />
-    <Content Include="Snippets\SimulatorSamples.cs" />
+    <None Include="Snippets\CreateOrder.cs" />
+    <None Include="Snippets\EditOrder.cs" />
+    <None Include="Snippets\SimulatorSamples.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Snippets\ClosedOrders.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +38,10 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Snippets\MyModule1.cs" />
   </ItemGroup>
 
   <ItemGroup>

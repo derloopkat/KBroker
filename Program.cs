@@ -31,7 +31,10 @@ namespace KBroker
                     broker = new Broker();
                 };
 
-                broker.WaitForStartPrice(operation.StartPrice ?? 0);
+                if(operation.StartPrice.HasValue) 
+                    broker.WaitForStartPrice(operation.StartPrice.Value);
+                else if(operation.StartVolume.HasValue) 
+                    broker.WaitForStarVolume(operation.StartVolume.Value);
 
                 var response = operation.SetupOrders(broker);
                 if (!operation.StopLoss.Error)

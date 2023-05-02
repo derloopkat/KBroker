@@ -3,7 +3,7 @@
 /* This code attempts to sell crypto. But since the validate flag is on,
  * server would only validate the request and not going to run it.
  */
-Configuration.LoadKeys();
+Configuration.LoadSecretKeys();
 var broker = new Broker();
 var order = new Order();
 Configuration.Pair = "LRCUSD";

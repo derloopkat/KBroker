@@ -1,17 +1,30 @@
 {
-  "timeout": 6000,
+  "timeout": 8000,
   "interval": 1,
   "version": 1.3,
   "simulation": {
-    "milestones": [ 14.5, 17.5, 16.5 ]
+    "milestones": [ 13.1, 12.9, 16.1, 10 ]
   },
   "operation": {
-    "type": "TrailingStopLoss",
+    "type": "OneCancelsTheOther",
     "pair": "FOOUSD",
+    "startVolume":  3,
     "stoploss": {
-      "id": "XXXXXX-XXXXX-00014",
-      "volume": 2,
-      "trailing": [ 15, 16, 17 ]
+      "price": 12,
+      "volume": 1,
+      "trigger": {
+        "price": 15.5,
+        "newPrice": 15
+      }
+    },
+    "takeprofit": {
+      "price": 16,
+      "volume": 1,
+      "greedy": true,
+      "trigger": {
+        "price": 14.5,
+        "newPrice": 15.5
+      }
     }
   }
 }

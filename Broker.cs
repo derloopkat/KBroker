@@ -119,13 +119,10 @@ namespace KBroker
             }
             finally
             {
-                if (errors?.Length > 0)
+                Display.PrintErrors(errors);
+                if (errors?.Contains("EGeneral:Too many requests") == true)
                 {
-                    Display.PrintErrors(errors);
-                    if (errors.Contains("EGeneral:Too many requests"))
-                    {
-                        Thread.Sleep(10000);
-                    }
+                    Thread.Sleep(10000);
                 }
             }
         }
@@ -164,7 +161,7 @@ namespace KBroker
                 catch (Exception ex)
                 {
                     Display.PrintError(ex.Message);
-                    Logger.AddEntry(ex.Message + $"\r\n{ex.StackTrace}");
+                    Logger.AddEntry(ex.Message + $"{Environment.NewLine}{ex.StackTrace}");
                 }
                 finally
                 {
@@ -172,6 +169,35 @@ namespace KBroker
                 }
             }
             Display.Print("");
+        }
+
+        public void WaitForStarVolume(decimal startVolume)
+        {
+            decimal volume = 0;
+            var asset = Configuration.Pair.Substring(0, Configuration.Pair.Length - 3);
+            Console.Title = $"Awaiting {asset} buy order to complete";
+            while (startVolume > volume)
+            {
+                try
+                {
+                    var timeStamp = DateTime.Now.ToLongTimeString();
+                    volume = GetAccountBalance(asset).Value;
+                    Display.Print($"{timeStamp} ", ConsoleColor.White, true);
+                    Display.Print($"Awaiting {asset} {startVolume} balance    ", ConsoleColor.Cyan, true);
+                    Display.CursorAnimation(ConsoleColor.Yellow);
+                    Display.Print("\r", ConsoleColor.Black, true);
+                }
+                catch (Exception ex)
+                {
+                    Display.PrintError($"Unable to retrieve balance from server: {ex.Message}");
+                    Logger.AddEntry(ex.Message + $"{Environment.NewLine}{ex.StackTrace}");
+                }
+                finally
+                {
+                    Thread.Sleep(IntervalMiliseconds);
+                }
+            }
+            Display.Print($"Confirmed your balance is {volume} {asset}.", ConsoleColor.Green);
         }
 
         public bool ConfirmOrder(Order order)
@@ -243,6 +269,13 @@ namespace KBroker
             return response;
         }
 
+        public virtual dynamic ClosedOrders(int offset = 50)
+        {
+            var json = KrakenApi.QueryPrivateEndpoint("ClosedOrders", $"ofs={offset}").Result;
+            var response = JsonConvert.DeserializeObject<dynamic>(json);
+            return response;
+        }
+
         public virtual dynamic QueryOrder(Order order)
         {
             var json = KrakenApi.QueryPrivateEndpoint("QueryOrders", order.QueryString).Result;
@@ -254,6 +287,7 @@ namespace KBroker
             order.IsOkay = status == "ok";
             order.IsOpen = status == "open";
             order.IsUnknown = response["error"].ToString().Contains("EOrder:Unknown order");
+            order.Error = response["error"].Count > 0;
             if (order.IsClosed)
             {
                 order.IsCompleted = response["result"][order.Id]["vol"] == response["result"][order.Id]["vol_exec"];
@@ -264,6 +298,22 @@ namespace KBroker
             }
             Logger.AddEntry($"QueryOrders: {order.QueryString} {Environment.NewLine}{Convert.ToString(response)}");
             return response;
+        }
+
+        public virtual dynamic GetAccountBalances()
+        {
+            var json = KrakenApi.QueryPrivateEndpoint("Balance", null).Result;
+            var response = JsonConvert.DeserializeObject<dynamic>(json);
+            return response;
+        }
+
+        private decimal? GetAccountBalance(string asset)
+        {
+            var response = GetAccountBalances();
+            var balance = response["result"][asset]?.Value;
+            var errors = response.error.ToObject<string[]>();
+            Display.PrintErrors(errors);
+            return decimal.Parse(balance);
         }
 
         public bool PriceLostTooMuchMargin(decimal currentPrice, decimal takeProfitPrice, bool useMarketPrice)

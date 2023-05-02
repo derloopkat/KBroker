@@ -91,7 +91,7 @@ namespace KBroker
 
         public static void PrintErrors(string[] errors)
         {
-            foreach (var error in errors)
+            foreach (var error in errors ?? Array.Empty<string>())
             {
                 PrintError(error);
             }
@@ -112,8 +112,6 @@ namespace KBroker
 
         public static void PrintWaitingForStartPrice(decimal currentPrice, decimal initialPrice, decimal startPrice)
         {
-            const int uniqueFrames = 3;
-            var frames = new List<string>() { "\u25A0  ", " \u25A0 ", "  \u25A0", " \u25A0 ", "\u25A0  " };  // "|/-\\|";
             var timeStamp = DateTime.Now.ToLongTimeString();
             var symbol = GetCurrencySymbol();
             var priceColor = currentPrice < initialPrice ? ConsoleColor.Red
@@ -125,12 +123,19 @@ namespace KBroker
             Print($"{symbol}{startPrice} ", ConsoleColor.Cyan, true);
             Print($"Current: ", ConsoleColor.White, true);
             Print($"{symbol}{currentPrice}    ", priceColor, true);
-            for(int i=0; i < frames.Count; i++)
+            CursorAnimation(priceColor);
+            Print("\r", ConsoleColor.Black, true);
+        }
+
+        public static void CursorAnimation(ConsoleColor cursorColor)
+        {
+            const int uniqueFrames = 3;
+            var frames = new List<string>() { "\u25A0  ", " \u25A0 ", "  \u25A0", " \u25A0 ", "\u25A0  " };  // "|/-\\|";
+            for (int i = 0; i < frames.Count; i++)
             {
-                Print($"{new String('\b', uniqueFrames)}{frames.ElementAt(i)}", priceColor, true);
+                Print($"{new String('\b', uniqueFrames)}{frames.ElementAt(i)}", cursorColor, true);
                 Thread.Sleep(200);
             }
-            Print("\r", ConsoleColor.Black, true);
         }
 
         public static int PrintProgress(decimal takeProfitPrice, decimal stopLossPrice, decimal currentPrice, decimal lastPrice)
