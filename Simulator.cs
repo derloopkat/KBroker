@@ -158,7 +158,7 @@ namespace KBroker
             var response = JsonConvert.DeserializeObject<dynamic>(json);
             order.Error = response["error"].Count > 0;
             order.IsUnknown = response["error"].ToString().Contains("EOrder:Unknown order");
-            order.IsClosed = response["result"]?["count"] == 1 || order.IsUnknown;
+            order.IsClosed = response["result"]?["count"]?.Value == 1 || order.IsUnknown;
             return response;
         }
 
@@ -206,7 +206,7 @@ namespace KBroker
             var cost = response["result"]?[order.Id]?["cost"];
             if (!String.IsNullOrEmpty(cost?.Value))
             {
-                order.Cost = cost;
+                order.Cost = (decimal)cost;
             }
             return response;
         }
