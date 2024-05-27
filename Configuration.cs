@@ -9,6 +9,7 @@ namespace KBroker
     {
         public const float LatestConfigurationVersionSupported = 1.3f;
         public const string OrdersFileName = "operation.json";
+        public const float MinimumIntervalForNonSimulatedEnvironment = 8f;
         public static int Timeout;
         public static float IntervalSeconds;
         public static string Pair;
@@ -24,6 +25,7 @@ namespace KBroker
                 var root = builder.Build();
                 var simulationSection = root.GetSection("simulation");
                 var operationSection = root.GetSection("operation");
+                var intervalSection = root.GetSection("interval");
                 var rootStartPrice = root.GetSection("startPrice");
                 var pair = operationSection.GetSection("pair");
                 var operationType = operationSection.GetSection("type").Value;
@@ -32,13 +34,21 @@ namespace KBroker
                 var useMarketPrice = operationSection.GetSection("useMarketPrice")?.Value ?? "false";
                 var cancelOrders = operationSection.GetSection("cancelOrders");
                 var version = root.GetSection("version");
+                var isSimulation = simulationSection.Exists();
 
                 if (!pair.Exists()) throw new Exception("Details: pair is missing. Please specify pair e.g. \"BTCUSD\".");
                 if (rootStartPrice.Exists()) throw new Exception("Start price was declared at the wrong level.");
 
                 Timeout = int.Parse(root.GetSection("timeout").Value);
-                IntervalSeconds = float.Parse(root.GetSection("interval").Value);
                 Pair = pair.Value.ToUpper();
+
+                if (intervalSection.Exists())
+                {
+                    var interval = float.Parse(root.GetSection("interval").Value);
+                    IntervalSeconds = isSimulation ? interval : Math.Max(interval, MinimumIntervalForNonSimulatedEnvironment);
+                }
+                else
+                    IntervalSeconds = isSimulation ? 1 : MinimumIntervalForNonSimulatedEnvironment;
 
                 if (operationType == "OneCancelsTheOther")
                 {
