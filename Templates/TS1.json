@@ -9,7 +9,7 @@
     "type": "TrailingStopLoss",
     "pair": "FOOUSD",
     "stoploss": {
-      "id": "XXXXXX-XXXXX-000014",
+      "id": "XXXXXX-PRICE-00014",
       "volume": 2,
       "trailing": [ 15, 16, 17 ]
     }

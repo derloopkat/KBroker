@@ -59,14 +59,14 @@ namespace KBroker
         {
             string json = KrakenApi.QueryPublicEndpoint("SystemStatus").Result;
             var response = JsonConvert.DeserializeObject<dynamic>(json);
-            //string[] errors = response.error.ToObject<string[]>();
+            //string[] errors = response["error"].ToObject<string[]>();
             //if (errors.Length > 0)
             //{
             //    return SystemStatus.OtherErrors;
             //}
             //else
             //{
-            return response.result?.status?.Value switch
+            return response["result"]?["status"]?.Value switch
             {
                 "online" => SystemStatus.Online,
                 "cancel_only" => SystemStatus.CancelOnly,
@@ -311,7 +311,7 @@ namespace KBroker
         {
             var response = GetAccountBalances();
             var balance = response["result"][asset]?.Value;
-            var errors = response.error.ToObject<string[]>();
+            var errors = response["error"].ToObject<string[]>();
             Display.PrintErrors(errors);
             return decimal.Parse(balance);
         }

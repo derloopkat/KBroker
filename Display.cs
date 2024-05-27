@@ -76,7 +76,7 @@ namespace KBroker
 
                 if (errorCount == 0 && responseText != "{}")
                     PrintCode(responseText);
-                else if(errorCount > 1 || (!(responseText ?? "").Contains("Too many requests")))
+                else if(errorCount > 1 || (!(responseText ?? "").Contains("Too many requests"))) /* Hidding too many request warning from api */
                     Console.Write("\a");
             }
         }
